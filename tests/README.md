@@ -1,4 +1,4 @@
 # Pruebas
 
-- `unit`: servicios, validaciones y componentes aislados.
-- `integration`: interacción entre rutas, servicios y repositorios.
+- `unit`: reglas de aplicación con el repositorio de demostración.
+- `integration`: comportamiento visible de las vistas.
