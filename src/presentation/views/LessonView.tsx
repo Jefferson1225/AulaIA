@@ -2,9 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Check, ChevronRight, Clock3, Code2, Lightbulb, LockKeyhole, MessageCircle, Sparkles } from "lucide-react";
 import type { Lesson } from "../../domain/course";
-import { TutorChat } from "../components/TutorChat";
 
-export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson; tutorAvailable?: boolean }) {
+export function LessonView({ lesson }: { lesson: Lesson }) {
   return (
     <div className="learning-layout">
       <header className="learning-header">
@@ -47,7 +46,7 @@ export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson;
             <div className="lesson-footer"><Link href="/inicio" className="button button-outline"><ArrowLeft size={17} /> Volver al inicio</Link><span>Seguimiento de progreso próximamente</span></div>
           </article>
         </main>
-        {tutorAvailable ? <TutorChat courseSlug={lesson.courseSlug} lessonSlug={lesson.slug} lessonTitle={lesson.title} /> : <aside className="tutor-panel">
+        <aside className="tutor-panel">
           <div className="tutor-heading"><span className="tutor-icon"><Sparkles size={21} /></span><div><strong>Tutor IA · Vista previa</strong><small>Contexto: Variables y tipos de datos</small></div></div>
           <div className="tutor-conversation">
             <div className="tutor-intro"><MessageCircle size={20} /><p>Este panel acompañará al estudiante mientras estudia la lección.</p></div>
@@ -55,7 +54,7 @@ export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson;
             <div className="message message-ai"><span><Sparkles size={13} /> EJEMPLO DE RESPUESTA</span>Una variable es como una etiqueta para guardar un dato. Si escribes <code>edad = 24</code>, podrás usar <code>edad</code> más adelante en tu programa.</div>
           </div>
           <div className="tutor-bottom"><div className="tutor-suggestions"><span>Sugerencias de ejemplo</span><span>Explícame este tema</span><span>Dame un ejemplo</span></div><div className="tutor-placeholder">Escribe tu pregunta… <LockKeyhole size={16} /></div><p>La conversación en tiempo real se habilitará al integrar DeepSeek.</p></div>
-        </aside>}
+        </aside>
       </div>
     </div>
   );

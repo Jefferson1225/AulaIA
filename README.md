@@ -1,22 +1,19 @@
 # AulaIA
 
-AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Su propuesta incorpora un Tutor IA contextual dentro de cada lección. El repositorio contiene un recorrido de estudiante con contenido de demostración y el primer módulo funcional: acceso, perfiles y Tutor IA.
+AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Su propuesta incorpora un Tutor IA contextual dentro de cada lección. Este repositorio contiene la base de la aplicación y un recorrido visual de estudiante con datos de demostración.
 
 ## Estado actual
 
-Se pueden recorrer las siguientes vistas:
+Se pueden recorrer cuatro vistas:
 
 | Ruta | Vista | Disponible ahora |
 |---|---|---|
-| `/login` | Acceso | Inicio de sesión con Supabase Auth |
-| `/registro` | Registro | Alta de estudiantes por correo y contraseña |
+| `/login` | Acceso | Presentación y entrada a la demostración |
 | `/inicio` | Inicio del estudiante | Cursos, progreso y actividades de ejemplo |
 | `/catalogo` | Catálogo | Búsqueda y filtros por categoría y nivel |
-| `/cursos/fundamentos-python/lecciones/variables-y-tipos` | Lección | Contenido de muestra y Tutor IA al configurar DeepSeek |
+| `/cursos/fundamentos-python/lecciones/variables-y-tipos` | Lección | Contenido de muestra y vista previa del Tutor IA |
 
-La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y lección requieren una sesión verificada. La migración crea un perfil para cada usuario y asigna el rol `student`. El Tutor IA consulta DeepSeek desde el servidor y recibe el contenido de la lección desde el repositorio, no desde el navegador. El catálogo, el progreso y las actividades aún usan datos de demostración.
-
-Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
+La ruta `/` abre `/inicio`. Los datos actuales provienen de un repositorio en memoria. El acceso, el progreso persistente y las respuestas del Tutor IA se conectarán a Supabase y DeepSeek en las siguientes etapas. La interfaz distingue las funciones de demostración de las integraciones todavía pendientes.
 
 ## Tecnologías
 
@@ -26,8 +23,8 @@ Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. 
 | Lenguaje | TypeScript |
 | Estilos | Tailwind CSS 4 y CSS global |
 | Iconos | Lucide React |
-| Autenticación y perfiles | Supabase Auth y PostgreSQL con RLS |
-| Tutor IA | DeepSeek API, modelo `deepseek-flash` por defecto |
+| Autenticación, base de datos y archivos previstos | Supabase |
+| Tutor IA previsto | DeepSeek mediante API y Vercel AI SDK |
 | Despliegue previsto | Vercel |
 | Pruebas | Vitest y Testing Library |
 | Gestor de paquetes | pnpm |
@@ -35,13 +32,13 @@ Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. 
 ## Diseño por capas
 
 ```text
-src/app             Rutas, layouts, acciones de servidor y endpoint del Tutor IA
+src/app             Rutas, layouts y composición de Next.js
     │
     ▼
 src/presentation    Vistas y componentes React
     │
     ▼
-src/application     Reglas de acceso, catálogo, panel, lección y Tutor IA
+src/application     Casos de uso de catálogo, panel y lección
     │
     ▼
 src/domain          Entidades y contratos de repositorio
@@ -50,7 +47,7 @@ src/domain          Entidades y contratos de repositorio
 src/infrastructure  Implementaciones de datos e integraciones
 ```
 
-**Dominio** define los conceptos del negocio y el contrato `CourseRepository`. **Aplicación** contiene reglas de validación y preparación del contexto de la lección. **Infraestructura** implementa las integraciones con Supabase y DeepSeek y aún entrega datos académicos de demostración. **Presentación** muestra las vistas y maneja interacciones locales. **App** declara rutas, protege sesiones y conecta las piezas. Los siguientes módulos reemplazarán el repositorio de cursos en memoria por adaptadores persistentes.
+**Dominio** define los conceptos del negocio y el contrato `CourseRepository`. **Aplicación** aplica las reglas de consulta, filtrado y selección sin conocer dónde se guardan los datos. **Infraestructura** implementa el contrato; por ahora entrega datos de demostración. **Presentación** muestra las vistas y maneja interacciones locales. **App** declara rutas y conecta las piezas. Al integrar Supabase, se reemplazará el adaptador de demostración sin trasladar consultas de datos a los componentes.
 
 ```text
 AulaIA/
@@ -58,10 +55,9 @@ AulaIA/
 │   └── brand/                     Identidad visual pública
 ├── src/
 │   ├── app/
-│   │   ├── (auth)/                 Acceso, registro y acciones de sesión
+│   │   ├── (auth)/login/           Ruta de acceso
 │   │   ├── (student)/              Inicio y catálogo con layout compartido
 │   │   ├── (learning)/             Ruta de lección
-│   │   ├── api/tutor/              Endpoint autenticado del Tutor IA
 │   │   └── page.tsx                Redirección inicial
 │   ├── presentation/
 │   │   ├── components/             Shell del estudiante, tarjetas y progreso
@@ -69,11 +65,9 @@ AulaIA/
 │   ├── application/                Casos de uso y filtros
 │   ├── domain/                     Modelos y contratos
 │   └── infrastructure/
-│       ├── demo/                   Repositorio de contenido de ejemplo
-│       ├── supabase/               Cliente SSR y perfiles
-│       └── deepseek/               Cliente del Tutor IA
+│       └── demo/                   Repositorio de datos de ejemplo
 ├── supabase/
-│   └── migrations/                Perfiles, políticas RLS y cupo del Tutor IA
+│   └── migrations/                Reservado para el esquema y las políticas
 ├── prolog/                         Reservado para representación lógica
 └── tests/
     ├── unit/                       Reglas de aplicación
@@ -99,9 +93,9 @@ pnpm install
 pnpm dev
 ```
 
-Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica la migración de `supabase/migrations/` en el proyecto de Supabase y habilita el proveedor de correo en Authentication. Configura las URL de redirección de localhost y del despliegue. Para activar el Tutor IA, añade `DEEPSEEK_API_KEY`; `DEEPSEEK_MODEL` permite cambiar el modelo y usa `deepseek-flash` por defecto. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
+Abre `http://localhost:3000`. Las vistas actuales funcionan sin configurar servicios externos.
 
-Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; un administrador puede asignar otros roles mediante SQL seguro, fuera del formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
+Cuando se integren Supabase y DeepSeek, crea `.env.local` a partir de `.env.example` y completa las variables correspondientes. No agregues credenciales al repositorio.
 
 ## Verificación
 
@@ -112,13 +106,14 @@ pnpm test
 pnpm build
 ```
 
-Las pruebas cubren el filtrado del catálogo, la selección del curso en progreso, la búsqueda de una lección, las vistas de ejemplo, la validación de credenciales y la preparación del contexto del Tutor IA. La autenticación real y las políticas SQL requieren un proyecto Supabase configurado para probarlas de extremo a extremo.
+Las pruebas cubren el filtrado del catálogo, la selección del curso en progreso, la búsqueda de una lección y el comportamiento visible de las vistas de ejemplo.
 
 ## Siguientes etapas
 
-1. Conectar el catálogo y los cursos con tablas y repositorios de Supabase.
-2. Implementar matrículas, progreso y evaluaciones con sus políticas RLS.
-3. Añadir administración de contenido y pruebas de integración con Supabase.
-4. Desplegar en Vercel y validar el flujo completo con credenciales reales.
+1. Implementar autenticación y roles con Supabase Auth.
+2. Crear el esquema PostgreSQL, las políticas RLS y los repositorios persistentes.
+3. Conectar matrículas, progreso, evaluaciones y administración.
+4. Integrar el Tutor IA contextual con DeepSeek mediante un endpoint de servidor.
+5. Añadir pruebas de integración y desplegar en Vercel.
 
 Proyecto desarrollado con fines académicos. La estructura permite incorporar estas funciones de forma gradual.

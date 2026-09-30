@@ -7,12 +7,11 @@ import { LessonView } from "../../src/presentation/views/LessonView";
 import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
 
 describe("vistas de ejemplo", () => {
-  it("muestra un formulario de acceso y la demostración solo cuando Supabase no está configurado", () => {
-    render(<LoginView configured={false} demoAvailable={true} />);
+  it("ofrece acceso claro a la demostración sin simular autenticación", () => {
+    render(<LoginView />);
 
-    expect(screen.getByRole("textbox", { name: "Correo electrónico" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Contraseña")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Explorar demostración" })).toHaveAttribute("href", "/inicio");
+    expect(screen.getByRole("link", { name: "Entrar como estudiante" })).toHaveAttribute("href", "/inicio");
+    expect(screen.getByText(/autenticación con Supabase se incorporará/)).toBeInTheDocument();
   });
 
   it("muestra el contenido académico y distingue el Tutor IA de demostración", async () => {

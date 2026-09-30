@@ -59,7 +59,6 @@ a { color: inherit; text-decoration: none; }
 .sidebar-profile strong, .sidebar-profile small { display: block; }
 .sidebar-profile strong { font-size: 12px; }
 .sidebar-profile small { margin-top: 3px; color: #b4a99d; font-size: 10px; }
-.sidebar-signout { width: 100%; border: 0; background: transparent; text-align: left; }
 .student-main { flex: 1; min-width: 0; }
 .student-topbar { height: 72px; display: flex; align-items: center; gap: 17px; padding: 0 clamp(24px, 3vw, 48px); background: var(--surface); border-bottom: 1px solid var(--border); }
 .top-search { width: min(345px, 40vw); height: 39px; display: flex; align-items: center; gap: 11px; padding: 0 14px; color: #897b6e; border: 1px solid #eee8e1; background: #faf8f5; border-radius: 10px; font-size: 12px; }
@@ -170,8 +169,6 @@ a { color: inherit; text-decoration: none; }
 .auth-fields input { height: 47px; margin-bottom: 19px; padding: 0 14px; color: #8e8378; background: #faf8f5; border: 1px solid var(--border); border-radius: 9px; }
 .auth-demo-button { width: 100%; margin-top: 3px; }
 .auth-note { margin-top: 17px; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.auth-note a { color: #a84720; font-weight: 700; }
-.auth-feedback { margin-top: 18px !important; padding: 11px 13px; background: #fff0e7; color: #8c3419 !important; border-radius: 8px; font-size: 12px !important; line-height: 1.5; }
 
 /* Lesson */
 .learning-layout { display: flex; flex-direction: column; flex: 1; height: 100vh; overflow: hidden; background: var(--surface); }
@@ -245,12 +242,6 @@ a { color: inherit; text-decoration: none; }
 .tutor-suggestions span:first-child { width: 100%; padding: 0; color: var(--muted); background: none; border: 0; border-radius: 0; }
 .tutor-placeholder { height: 42px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; color: #9d938a; border: 1px solid var(--border); border-radius: 9px; font-size: 11px; }
 .tutor-bottom > p { margin: 10px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; text-align: center; }
-.tutor-bottom label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
-.tutor-input-row { display: flex; gap: 8px; }
-.tutor-input-row input { min-width: 0; flex: 1; height: 42px; padding: 0 11px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--foreground); font-size: 11px; }
-.tutor-input-row button { padding: 0 12px; border: 0; border-radius: 9px; background: var(--accent); color: var(--foreground); font-size: 11px; font-weight: 700; }
-.tutor-input-row button:disabled { opacity: .5; cursor: not-allowed; }
-.tutor-wait { color: var(--muted); font-size: 11px; }
 
 @media (max-width: 1190px) {
   .learning-grid { grid-template-columns: 210px minmax(0, 1fr) 280px; }
