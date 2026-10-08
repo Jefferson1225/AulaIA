@@ -11,10 +11,10 @@ Se pueden recorrer las siguientes vistas:
 | `/login` | Acceso | Inicio de sesión con Supabase Auth |
 | `/registro` | Registro | Alta de estudiantes por correo y contraseña |
 | `/inicio` | Inicio del estudiante | Cursos, progreso y actividades de ejemplo |
-| `/catalogo` | Catálogo | Búsqueda y filtros por categoría y nivel |
+| `/catalogo` | Catálogo | Cursos publicados y categorías desde Supabase, con búsqueda y filtros |
 | `/cursos/fundamentos-python/lecciones/variables-y-tipos` | Lección | Contenido de muestra y Tutor IA al configurar DeepSeek |
 
-La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y lección requieren una sesión verificada. La migración crea un perfil para cada usuario y asigna el rol `student`. El Tutor IA consulta DeepSeek desde el servidor y recibe el contenido de la lección desde el repositorio, no desde el navegador. El catálogo, el progreso y las actividades aún usan datos de demostración.
+La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y lección requieren una sesión verificada. La migración crea un perfil para cada usuario y asigna el rol `student`. El Tutor IA consulta DeepSeek desde el servidor y recibe el contenido de la lección desde el repositorio, no desde el navegador. El catálogo lee categorías y cursos publicados desde Supabase; el progreso, las actividades y las lecciones aún usan datos de demostración.
 
 Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
 
@@ -50,7 +50,7 @@ src/domain          Entidades y contratos de repositorio
 src/infrastructure  Implementaciones de datos e integraciones
 ```
 
-**Dominio** define los conceptos del negocio y el contrato `CourseRepository`. **Aplicación** contiene reglas de validación y preparación del contexto de la lección. **Infraestructura** implementa las integraciones con Supabase y DeepSeek y aún entrega datos académicos de demostración. **Presentación** muestra las vistas y maneja interacciones locales. **App** declara rutas, protege sesiones y conecta las piezas. Los siguientes módulos reemplazarán el repositorio de cursos en memoria por adaptadores persistentes.
+**Dominio** define los conceptos del negocio y los contratos de repositorio. **Aplicación** contiene reglas de validación, filtrado y preparación del contexto de la lección. **Infraestructura** implementa el catálogo en Supabase, la integración con DeepSeek y los adaptadores de demostración para las funciones pendientes. **Presentación** muestra las vistas y maneja interacciones locales. **App** declara rutas, protege sesiones y conecta las piezas.
 
 ```text
 AulaIA/
@@ -70,10 +70,10 @@ AulaIA/
 │   ├── domain/                     Modelos y contratos
 │   └── infrastructure/
 │       ├── demo/                   Repositorio de contenido de ejemplo
-│       ├── supabase/               Cliente SSR y perfiles
+│       ├── supabase/               Cliente SSR, perfiles y catálogo
 │       └── deepseek/               Cliente del Tutor IA
 ├── supabase/
-│   └── migrations/                Perfiles, políticas RLS y cupo del Tutor IA
+│   └── migrations/                Perfiles, catálogo, políticas RLS y cupo del Tutor IA
 ├── prolog/                         Reservado para representación lógica
 └── tests/
     ├── unit/                       Reglas de aplicación
@@ -99,7 +99,7 @@ pnpm install
 pnpm dev
 ```
 
-Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica la migración de `supabase/migrations/` en el proyecto de Supabase y habilita el proveedor de correo en Authentication. Configura las URL de redirección de localhost y del despliegue. Para activar el Tutor IA, añade `DEEPSEEK_API_KEY`; `DEEPSEEK_MODEL` permite cambiar el modelo y usa `deepseek-flash` por defecto. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
+Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden en el proyecto de Supabase y habilita el proveedor de correo en Authentication. La segunda migración crea el catálogo y carga seis cursos iniciales. Configura las URL de redirección de localhost y del despliegue. Para activar el Tutor IA, añade `DEEPSEEK_API_KEY`; `DEEPSEEK_MODEL` permite cambiar el modelo y usa `deepseek-flash` por defecto. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
 
 Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; un administrador puede asignar otros roles mediante SQL seguro, fuera del formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
 
@@ -116,9 +116,9 @@ Las pruebas cubren el filtrado del catálogo, la selección del curso en progres
 
 ## Siguientes etapas
 
-1. Conectar el catálogo y los cursos con tablas y repositorios de Supabase.
+1. Implementar módulos y lecciones persistentes y la administración de contenido.
 2. Implementar matrículas, progreso y evaluaciones con sus políticas RLS.
-3. Añadir administración de contenido y pruebas de integración con Supabase.
+3. Añadir pruebas de integración con Supabase.
 4. Desplegar en Vercel y validar el flujo completo con credenciales reales.
 
 Proyecto desarrollado con fines académicos. La estructura permite incorporar estas funciones de forma gradual.

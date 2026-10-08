@@ -1,5 +1,11 @@
-export type CourseCategory = "programacion" | "datos" | "idiomas" | "matematicas" | "diseno" | "negocios";
+export type CourseCategory = string;
 export type CourseLevel = "principiante" | "intermedio" | "avanzado";
+
+export interface CatalogCategory {
+  slug: string;
+  name: string;
+  position: number;
+}
 
 export interface Course {
   slug: string;
