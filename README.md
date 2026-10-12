@@ -103,6 +103,10 @@ Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a p
 
 Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; un administrador puede asignar otros roles mediante SQL seguro, fuera del formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
 
+## Actividad de Supabase
+
+El flujo `.github/workflows/actividad-supabase.yml` realiza tres consultas de solo lectura al día al proyecto Supabase durante el desarrollo. Requiere aplicar `supabase/migrations/20261011000000_activity_ping.sql` y configurar `SUPABASE_PUBLISHABLE_KEY` como secreto del repositorio en GitHub Actions. Las ejecuciones se pueden revisar en la pestaña Actions. En repositorios públicos, GitHub desactiva los flujos programados tras 60 días sin actividad en el repositorio; el plan Pro de Supabase es la opción para evitar pausas por inactividad con garantía.
+
 ## Verificación
 
 ```bash
