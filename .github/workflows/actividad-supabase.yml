@@ -1,0 +1,35 @@
+name: Actividad de Supabase
+
+on:
+  schedule:
+    - cron: "37 2,10,18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  consultar-base-de-datos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Consultar Supabase
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$SUPABASE_PUBLISHABLE_KEY" ]]; then
+            echo "Falta el secreto SUPABASE_PUBLISHABLE_KEY."
+            exit 1
+          fi
+          response=$(curl --fail --silent --show-error --retry 2 --retry-delay 5 --max-time 20 \
+            -X POST "https://oyswcwnijecwpymctxtw.supabase.co/rest/v1/rpc/aulaia_activity_ping" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            -H "Content-Type: application/json" \
+            --data '{}')
+          if [[ "$response" != "true" ]]; then
+            echo "Supabase respondió, pero no se confirmó la consulta."
+            exit 1
+          fi
+          echo "Consulta a Supabase completada."
