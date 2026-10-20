@@ -1,0 +1,77 @@
+.admin-shell { min-height: 100vh; display: grid; grid-template-columns: 240px minmax(0, 1fr); background: var(--background); }
+.admin-sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 16px; padding: 28px 20px; background: var(--sidebar); color: #fff; }
+.admin-sidebar > a:first-child { width: fit-content; padding: 7px 10px; border-radius: 10px; background: #fff; }
+.admin-sidebar > a:first-child img { display: block; width: 135px; height: auto; }
+.admin-role { margin: 16px 0 4px; color: #a99787; font-size: 10px; font-weight: 800; letter-spacing: .15em; }
+.admin-sidebar nav { display: grid; gap: 6px; }
+.admin-sidebar nav a, .admin-sidebar form button { width: 100%; display: block; padding: 12px; border-radius: 9px; color: #eee5df; text-align: left; font-size: 13px; font-weight: 650; }
+.admin-sidebar nav a:hover, .admin-sidebar form button:hover { background: #3b322b; }
+.admin-sidebar form { margin-top: auto; }
+.admin-sidebar form button { border: 0; background: transparent; }
+.admin-main { min-width: 0; }
+.admin-container { width: min(1120px, 100%); margin: 0 auto; padding: 43px clamp(22px, 4vw, 60px) 80px; }
+.admin-heading { margin: 0 0 29px; }
+.admin-heading h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(29px, 3vw, 38px); line-height: 1.2; letter-spacing: -.045em; }
+.admin-heading > p:last-of-type { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.admin-detail-heading { margin-top: 27px; }
+.admin-detail-heading > a { margin-top: 14px; }
+.admin-panel { margin-top: 22px; padding: 25px; border: 1px solid var(--border); border-radius: 15px; background: #fff; }
+.admin-section-heading, .admin-module-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+.admin-section-heading h2, .admin-module-heading h3 { margin: 0; font-family: "Manrope", sans-serif; font-size: 19px; letter-spacing: -.03em; }
+.admin-section-heading span, .admin-module-heading span, .admin-muted { color: var(--muted); font-size: 12px; }
+.admin-course-list { display: grid; }
+.admin-course-row { min-height: 69px; display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid #eee8e1; }
+.admin-course-row:hover strong { color: #a84720; }
+.admin-course-row > span:nth-child(2) { min-width: 0; flex: 1; }
+.admin-course-row strong, .admin-course-row small { display: block; }
+.admin-course-row strong { font-size: 14px; }
+.admin-course-row small { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.admin-course-symbol { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 9px; background: var(--accent-soft); color: #a84720; font-size: 18px; font-weight: 800; }
+.admin-badge { padding: 6px 8px; border-radius: 99px; background: #f1ece7; color: #72665d; font-size: 10px; font-weight: 800; }
+.admin-badge-live { background: #e5f5eb; color: #24663c; }
+.admin-form { display: grid; gap: 16px; }
+.admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.admin-form label:not(.admin-check), .admin-inline-form label { min-width: 0; display: grid; gap: 7px; color: #4f4238; font-size: 11px; font-weight: 800; }
+.admin-form input:not([type="checkbox"]), .admin-form select, .admin-form textarea { width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fdfcfb; color: var(--foreground); font-size: 12px; font-weight: 500; }
+.admin-form textarea { resize: vertical; line-height: 1.55; }
+.admin-form .button { justify-self: start; }
+.admin-check { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 650; }
+.admin-check input { accent-color: var(--accent); }
+.admin-feedback { padding: 13px 15px; border-radius: 9px; background: #e5f5eb; color: #245f38; font-size: 12px; font-weight: 700; }
+.admin-feedback-error { background: #fff0e7; color: #a14120; }
+.admin-danger-form { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; padding-top: 17px; border-top: 1px dashed #edcdbf; }
+.admin-danger-form button { min-height: 37px; padding: 0 12px; color: #9a341b; font-size: 11px; }
+.admin-module { margin-top: 22px; padding: 22px; border: 1px solid #e9ddd3; border-radius: 12px; background: #fffdfb; }
+.admin-inline-form { grid-template-columns: minmax(0, 2fr) minmax(100px, .6fr) auto; align-items: end; }
+.admin-inline-form .button { min-height: 43px; }
+.admin-lessons { margin: 20px 0; display: grid; gap: 9px; }
+.admin-lesson { border: 1px solid #eee5de; border-radius: 9px; background: #fff; }
+.admin-lesson summary, .admin-add-details summary { cursor: pointer; padding: 13px 15px; }
+.admin-lesson summary { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; }
+.admin-lesson summary span { color: var(--muted); }
+.admin-lesson > .admin-form, .admin-lesson > .admin-danger-form { margin: 0 15px 15px; }
+.admin-add-details { margin-top: 20px; border: 1px dashed #e6b99f; border-radius: 9px; }
+.admin-add-details summary { color: #a84720; font-size: 12px; font-weight: 800; }
+.admin-add-details > form { padding: 2px 15px 18px; }
+.admin-add-module { margin-top: 30px; padding-top: 23px; border-top: 1px solid var(--border); }
+.admin-add-module h3 { margin: 0 0 17px; font-size: 16px; }
+.admin-add-module .admin-inline-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 100px auto; }
+
+@media (max-width: 900px) {
+  .admin-shell { grid-template-columns: 1fr; }
+  .admin-sidebar { position: static; height: auto; flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px 20px; }
+  .admin-sidebar > a:first-child img { width: 95px; }
+  .admin-role { display: none; }
+  .admin-sidebar nav { display: flex; flex-wrap: wrap; }
+  .admin-sidebar nav a { width: auto; }
+  .admin-sidebar form { margin: 0 0 0 auto; }
+  .admin-inline-form, .admin-add-module .admin-inline-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .admin-container { padding: 28px 17px 55px; }
+  .admin-panel, .admin-module { padding: 18px; }
+  .admin-form-grid, .admin-inline-form, .admin-add-module .admin-inline-form { grid-template-columns: 1fr; }
+  .admin-course-row { flex-wrap: wrap; }
+  .admin-sidebar { align-items: start; }
+  .admin-sidebar form { margin-left: 0; }
+}
