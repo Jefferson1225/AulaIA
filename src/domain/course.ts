@@ -22,11 +22,14 @@ export interface Course {
 export interface Lesson {
   slug: string;
   courseSlug: string;
+  courseTitle?: string;
+  courseLevel?: CourseLevel;
   title: string;
   number: number;
   totalLessons: number;
   durationMinutes: number;
   moduleTitle: string;
+  moduleLessons?: { slug: string; title: string; durationMinutes: number }[];
   intro: string;
   sections: {
     title: string;

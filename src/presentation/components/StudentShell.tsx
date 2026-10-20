@@ -47,6 +47,7 @@ export function StudentShell({ children, profile, email, demo = false, signOutAc
               {pathname === href && <ChevronRight size={15} className="nav-chevron" />}
             </Link>
           ))}
+          {profile?.role === "admin" && <Link href="/admin/cursos" className="nav-link"><BookOpen size={19} strokeWidth={1.8} /><span>Gestionar cursos</span></Link>}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note"><GraduationCap size={20} /><span>Aprende a tu ritmo, con apoyo en cada paso.</span></div>

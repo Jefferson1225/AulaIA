@@ -25,4 +25,21 @@ describe("vistas de ejemplo", () => {
     expect(screen.getByText(/nombre = "Valentina"/)).toBeInTheDocument();
     expect(screen.getByText(/Tutor IA · Vista previa/)).toBeInTheDocument();
   });
+
+  it("usa el nombre y la navegación de una lección gestionada", async () => {
+    const sample = await demoCourseRepository.findLesson("fundamentos-python", "variables-y-tipos");
+    if (!sample) throw new Error("Falta la lección de prueba");
+    render(<LessonView lesson={{
+      ...sample,
+      courseSlug: "robotica-basica",
+      courseTitle: "Robótica básica",
+      courseLevel: "intermedio",
+      moduleTitle: "Sensores",
+      moduleLessons: [{ slug: "variables-y-tipos", title: sample.title, durationMinutes: 18 }],
+    }} />);
+
+    expect(screen.getAllByRole("link", { name: "Volver al curso" })[0]).toHaveAttribute("href", "/cursos/robotica-basica");
+    expect(screen.getByRole("link", { name: /Robótica básica/ })).toHaveAttribute("href", "/cursos/robotica-basica");
+    expect(screen.getByText("intermedio")).toBeInTheDocument();
+  });
 });

@@ -33,6 +33,7 @@ describe("vista del catálogo", () => {
     expect(screen.getByRole("option", { name: "Robótica" })).toBeInTheDocument();
     fireEvent.change(screen.getByRole("combobox", { name: "Categoría" }), { target: { value: "robotica" } });
     expect(screen.getByText("Robótica básica")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /ver contenido/i })).toHaveAttribute("href", "/cursos/robotica-basica");
     expect(screen.queryByText("Fundamentos de Python")).not.toBeInTheDocument();
   });
 });
