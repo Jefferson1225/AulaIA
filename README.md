@@ -1,6 +1,6 @@
 # AulaIA
 
-AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Su propuesta incorpora un Tutor IA contextual dentro de cada lección. El repositorio incluye acceso, perfiles, catálogo y gestión de cursos, módulos y lecciones.
+AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Su propuesta incorpora un Tutor IA contextual dentro de cada lección. El repositorio incluye acceso, perfiles, catálogo, gestión de contenido, matrículas y seguimiento del progreso.
 
 ## Estado actual
 
@@ -10,13 +10,15 @@ Se pueden recorrer las siguientes vistas:
 |---|---|---|
 | `/login` | Acceso | Inicio de sesión con Supabase Auth |
 | `/registro` | Registro | Alta de estudiantes por correo y contraseña |
-| `/inicio` | Inicio del estudiante | Cursos, progreso y actividades de ejemplo |
+| `/inicio` | Inicio del estudiante | Matrículas, progreso, siguiente lección pendiente y recomendaciones desde Supabase |
 | `/catalogo` | Catálogo | Cursos publicados y categorías desde Supabase, con búsqueda y filtros |
-| `/cursos/[curso]` | Detalle de curso | Módulos y lecciones publicados |
-| `/cursos/fundamentos-python/lecciones/variables-y-tipos` | Lección | Contenido de muestra y Tutor IA al configurar DeepSeek |
+| `/cursos/[curso]` | Detalle de curso | Contenido publicado, matrícula y resumen del avance propio |
+| `/cursos/[curso]/lecciones/[leccion]` | Lección | Contenido persistente, marcar o desmarcar como completada y Tutor IA al configurar DeepSeek |
 | `/admin/cursos` | Gestión de contenido | Crear, editar y publicar cursos; administrar módulos y lecciones con rol `admin` |
 
-La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y lección requieren una sesión verificada. La migración crea un perfil para cada usuario y asigna el rol `student`. El Tutor IA consulta DeepSeek desde el servidor y recibe el contenido de la lección desde el repositorio, no desde el navegador. El catálogo, los módulos y las lecciones publicadas se leen desde Supabase. El progreso y las actividades aún usan datos de demostración. La gestión de contenido exige rol `admin` tanto en las acciones del servidor como en las políticas RLS de PostgreSQL.
+La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y lección requieren una sesión verificada. Las cuentas nuevas reciben el rol `student`. El catálogo y el contenido publicado se leen desde Supabase. Cada cuenta puede matricularse, completar lecciones y retomar la primera pendiente; los datos se conservan entre sesiones. La gestión de contenido exige rol `admin` tanto en las acciones del servidor como en PostgreSQL. El Tutor IA consulta DeepSeek desde el servidor con el contenido de la lección.
+
+El porcentaje de avance se calcula con las lecciones actuales del curso, sin almacenar un porcentaje editable por el navegador. Las claves compuestas impiden duplicar matrículas y completados. Las políticas RLS restringen el avance a su propietario y exigen una matrícula para completar lecciones. Si se elimina una lección, se elimina su completado asociado; si se agrega contenido, el avance se recalcula. Las actividades del inicio son lecciones pendientes reales; las evaluaciones se implementarán posteriormente.
 
 Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
 
@@ -73,10 +75,11 @@ AulaIA/
 │   ├── domain/                     Modelos y contratos
 │   └── infrastructure/
 │       ├── demo/                   Repositorio de contenido de ejemplo
-│       ├── supabase/               Cliente SSR, perfiles, catálogo y contenido
+│       ├── supabase/               Cliente SSR, perfiles, catálogo, contenido y avance
 │       └── deepseek/               Cliente del Tutor IA
 ├── supabase/
-│   └── migrations/                Perfiles, catálogo, contenido, políticas RLS y cupo del Tutor IA
+│   ├── migrations/                Perfiles, catálogo, contenido, matrículas, avance y políticas RLS
+│   └── tests/                     Comprobaciones SQL de aislamiento y relaciones
 ├── prolog/                         Reservado para representación lógica
 └── tests/
     ├── unit/                       Reglas de aplicación
@@ -102,7 +105,7 @@ pnpm install
 pnpm dev
 ```
 
-Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden en el proyecto de Supabase y habilita el proveedor de correo en Authentication. La segunda migración crea el catálogo y la tercera agrega módulos, lecciones y administración. Configura las URL de redirección de localhost y del despliegue. Para activar el Tutor IA, añade `DEEPSEEK_API_KEY`; `DEEPSEEK_MODEL` permite cambiar el modelo y usa `deepseek-flash` por defecto. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
+Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden y habilita el proveedor de correo en Authentication. La migración `20261021000000_enrollments_progress.sql` requiere que ya existan cursos, módulos y lecciones. Configura las URL de redirección de localhost y del despliegue. DeepSeek es opcional para probar matrículas y avance; para activar el tutor añade `DEEPSEEK_API_KEY`. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
 
 Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; para gestionar contenido hay que asignar `admin` a una cuenta desde el editor SQL de Supabase, después de verificar su UUID en Authentication. No se cambia el rol desde el formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
 
@@ -115,11 +118,11 @@ pnpm test
 pnpm build
 ```
 
-Las pruebas cubren el filtrado del catálogo, la selección del curso en progreso, las vistas de curso y lección, la validación de contenido y credenciales, y la preparación del contexto del Tutor IA. La autenticación real y las políticas SQL requieren un proyecto Supabase configurado para probarlas de extremo a extremo.
+Las pruebas cubren el catálogo, el cálculo del avance, la navegación a lecciones pendientes, los formularios de matrícula y completado, las vistas, la validación de datos y el contexto del Tutor IA. `supabase/tests/learning_rls.sql` comprueba las restricciones de acceso y relaciones en una base PostgreSQL de pruebas con las migraciones aplicadas. El flujo completo de correo, sesión y API de Supabase se valida con un proyecto configurado.
 
 ## Siguientes etapas
 
-1. Implementar matrículas, progreso y evaluaciones con sus políticas RLS.
+1. Implementar evaluaciones, calificación y resultados con sus políticas RLS.
 2. Añadir pruebas de integración con Supabase.
 3. Desplegar en Vercel y validar el flujo completo con credenciales reales.
 
