@@ -44,4 +44,5 @@ export interface LearningActivity {
   title: string;
   detail: string;
   kind: "evaluation" | "lesson" | "practice";
+  href?: string;
 }

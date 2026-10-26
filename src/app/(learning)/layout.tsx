@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSupabaseConfig } from "../../infrastructure/supabase/config";
 import { createSupabaseServerClient } from "../../infrastructure/supabase/server";
 import "../../presentation/content.css";
+import "../../presentation/learning.css";
 
 export const dynamic = "force-dynamic";
 

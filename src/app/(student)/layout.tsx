@@ -5,6 +5,7 @@ import { getSupabaseConfig } from "../../infrastructure/supabase/config";
 import { createSupabaseServerClient } from "../../infrastructure/supabase/server";
 import { getProfile } from "../../infrastructure/supabase/profile-repository";
 import { signOut } from "../(auth)/actions";
+import "../../presentation/learning.css";
 
 export const dynamic = "force-dynamic";
 

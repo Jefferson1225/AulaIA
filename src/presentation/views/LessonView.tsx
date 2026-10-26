@@ -3,11 +3,21 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, ChevronRight, Clock3, Lightbulb, LockKeyhole, MessageCircle, Sparkles } from "lucide-react";
 import type { Lesson } from "../../domain/course";
 import { TutorChat } from "../components/TutorChat";
+import type { CourseProgress } from "../../domain/learning";
+import { LearningSubmitButton } from "../components/LearningSubmitButton";
+import { LearningFeedback } from "../components/LearningFeedback";
 
-export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson; tutorAvailable?: boolean }) {
+export function LessonView({ lesson, tutorAvailable = false, progress, completionAction, status }: {
+  lesson: Lesson;
+  tutorAvailable?: boolean;
+  progress?: CourseProgress;
+  completionAction?: (form: FormData) => Promise<void>;
+  status?: string;
+}) {
   const courseUrl = `/cursos/${lesson.courseSlug}`;
   const courseTitle = lesson.courseTitle ?? lesson.courseSlug;
   const moduleLessons = lesson.moduleLessons ?? [{ slug: lesson.slug, title: lesson.title, durationMinutes: lesson.durationMinutes }];
+  const completed = progress?.completedLessonSlugs.includes(lesson.slug) ?? false;
   return (
     <div className="learning-layout">
       <header className="learning-header">
@@ -24,7 +34,7 @@ export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson;
           <ol className="lesson-list">
             {moduleLessons.map((item, index) => <li key={item.slug} className={item.slug === lesson.slug ? "lesson-current" : undefined}>
               <span className="lesson-status">{index + 1}</span>
-              <Link href={`/cursos/${lesson.courseSlug}/lecciones/${item.slug}`}>{item.title}<small>{item.durationMinutes} min{item.slug === lesson.slug ? " · actual" : ""}</small></Link>
+              <Link href={`/cursos/${lesson.courseSlug}/lecciones/${item.slug}`}>{item.title}<small>{item.durationMinutes} min{progress?.completedLessonSlugs.includes(item.slug) ? " · completada" : ""}{item.slug === lesson.slug ? " · actual" : ""}</small></Link>
             </li>)}
           </ol>
         </aside>
@@ -44,7 +54,21 @@ export function LessonView({ lesson, tutorAvailable = false }: { lesson: Lesson;
               </section>)}
               {lesson.tip && <div className="lesson-tip"><Lightbulb size={19} /><p>{lesson.tip}</p></div>}
             </div>
-            <div className="lesson-footer"><Link href={courseUrl} className="button button-outline"><ArrowLeft size={17} /> Volver al curso</Link><span>Seguimiento de progreso próximamente</span></div>
+            <LearningFeedback status={status} />
+            <div className="lesson-footer">
+              <Link href={courseUrl} className="button button-outline"><ArrowLeft size={17} /> Volver al curso</Link>
+              {progress ? progress.enrolled ? <div className="lesson-completion-actions">
+                {completionAction && <form action={completionAction}>
+                  <input type="hidden" name="courseSlug" value={lesson.courseSlug} />
+                  <input type="hidden" name="lessonSlug" value={lesson.slug} />
+                  <input type="hidden" name="completed" value={String(!completed)} />
+                  <LearningSubmitButton>{completed ? "Marcar como pendiente" : "Marcar como completada"}</LearningSubmitButton>
+                </form>}
+                <span>{completed ? "Lección completada" : "Lección pendiente"}</span>
+                {progress.nextLesson && progress.nextLesson.slug !== lesson.slug && <Link className="text-link" href={`/cursos/${lesson.courseSlug}/lecciones/${progress.nextLesson.slug}`}>Ir a la siguiente pendiente →</Link>}
+              </div> : <Link className="text-link" href={courseUrl}>Matricúlate para guardar tu avance →</Link>
+                : <span>Vista de demostración: el avance no se guarda.</span>}
+            </div>
           </article>
         </main>
         {tutorAvailable ? <TutorChat courseSlug={lesson.courseSlug} lessonSlug={lesson.slug} lessonTitle={lesson.title} /> : <aside className="tutor-panel">
