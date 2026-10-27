@@ -9,6 +9,7 @@ import { buildCourseProgress } from "../../../../application/learning-progress";
 import { requireLearningUser } from "../../../../infrastructure/supabase/learning-access";
 import { createLearningRepository } from "../../../../infrastructure/supabase/learning-repository";
 import { enrollCourseAction } from "../actions";
+import { createAssessmentRepository } from "../../../../infrastructure/supabase/assessment-repository";
 
 export const metadata: Metadata = { title: "Contenido del curso · AulaIA" };
 
@@ -20,8 +21,8 @@ export default async function CoursePage({ params, searchParams }: { params: Pro
   if (!course) notFound();
   if (getSupabaseConfig()) {
     const { client, user } = await requireLearningUser();
-    const [snapshot, query] = await Promise.all([createLearningRepository(client, user.id).read(), searchParams]);
-    return <CourseOverviewView course={course} progress={buildCourseProgress(course, snapshot)} enrollAction={enrollCourseAction} status={query.estado} />;
+    const [snapshot, query, assessments] = await Promise.all([createLearningRepository(client, user.id).read(), searchParams, createAssessmentRepository(client,user.id).listPublished(slug)]);
+    return <CourseOverviewView course={course} progress={buildCourseProgress(course, snapshot)} enrollAction={enrollCourseAction} status={query.estado} assessments={assessments} />;
   }
   return <CourseOverviewView course={course} demo />;
 }
