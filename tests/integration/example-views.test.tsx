@@ -10,7 +10,7 @@ describe("vistas de ejemplo", () => {
   it("muestra un formulario de acceso y la demostración solo cuando Supabase no está configurado", () => {
     render(<LoginView configured={false} demoAvailable={true} />);
 
-    expect(screen.getByRole("textbox", { name: "Correo electrónico" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Correo electrónico o usuario" })).toHaveAttribute("type", "text");
     expect(screen.getByLabelText("Contraseña")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Explorar demostración" })).toHaveAttribute("href", "/inicio");
   });

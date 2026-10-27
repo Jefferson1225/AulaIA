@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { validateLogin, validateRegistration } from "../../application/auth";
+import { resolveLoginEmail, validateLogin, validateRegistration } from "../../application/auth";
 import { createSupabaseServerClient } from "../../infrastructure/supabase/server";
 
 function authRedirect(code: string, registration = false): never {
@@ -9,7 +9,7 @@ function authRedirect(code: string, registration = false): never {
 }
 
 export async function signIn(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = resolveLoginEmail(String(formData.get("email") ?? ""));
   const password = String(formData.get("password") ?? "");
   if (validateLogin(email, password)) authRedirect("datos_invalidos");
 
@@ -29,7 +29,10 @@ export async function signUp(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/callback`,
+    },
   });
   if (error) authRedirect("registro_fallido", true);
   if (!data.session) authRedirect("confirma_correo");

@@ -1,5 +1,11 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export function resolveLoginEmail(identifier: string): string {
+  const clean = identifier.trim();
+  const handle = clean.toLowerCase();
+  return ["alumno1", "alumno2", "profesor1"].includes(handle) ? `${handle}@demo.aulaia.test` : clean;
+}
+
 export function validateLogin(email: string, password: string): string | null {
   if (!emailPattern.test(email.trim())) return "Ingresa un correo válido.";
   if (!password) return "Ingresa tu contraseña.";

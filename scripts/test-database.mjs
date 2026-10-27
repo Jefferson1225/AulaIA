@@ -1,5 +1,6 @@
 import { PGlite } from '@electric-sql/pglite';
 import { readFile, readdir } from 'node:fs/promises';
+import assert from 'node:assert/strict';
 
 const db = new PGlite();
 try {
@@ -12,6 +13,11 @@ try {
     await db.exec(await readFile(`supabase/migrations/${file}`,'utf8'));
     console.log(`Migración: ${file}`);
   }
+  const counts = 'select (select count(*) from public.modules) as modules,(select count(*) from public.lessons) as lessons,(select count(*) from public.assessments) as assessments,(select count(*) from public.assessment_questions) as questions';
+  const before = await db.query(counts);
+  await db.exec(await readFile('supabase/migrations/20261027010000_initial_learning_content.sql','utf8'));
+  assert.deepEqual((await db.query(counts)).rows,before.rows,'Repetir el contenido inicial no debe duplicar registros.');
+  console.log('Contenido inicial repetible sin duplicados.');
   for (const file of (await readdir('supabase/tests')).filter(name=>name.endsWith('.sql')).sort()) {
     await db.exec(await readFile(`supabase/tests/${file}`,'utf8'));
     console.log(`Prueba SQL aprobada: ${file}`);
