@@ -5,13 +5,15 @@ import type { CourseProgress } from "../../domain/learning";
 import { ProgressBar } from "../components/ProgressBar";
 import { LearningSubmitButton } from "../components/LearningSubmitButton";
 import { LearningFeedback } from "../components/LearningFeedback";
+import type { Assessment } from "../../domain/assessment";
 
-export function CourseOverviewView({ course, progress, enrollAction, status, demo = false }: {
+export function CourseOverviewView({ course, progress, enrollAction, status, demo = false, assessments = [] }: {
   course: PublishedCourse;
   progress?: CourseProgress;
   enrollAction?: (form: FormData) => Promise<void>;
   status?: string;
   demo?: boolean;
+  assessments?: Assessment[];
 }) {
   const lessonCount = course.modules.reduce((total, module) => total + module.lessons.length, 0);
   return (
@@ -54,6 +56,7 @@ export function CourseOverviewView({ course, progress, enrollAction, status, dem
           </li>)}</ol> : <p>Aún no hay lecciones en este módulo.</p>}
         </article>) : <div className="content-empty"><BookOpen size={27} /><p>Este curso todavía no tiene lecciones. Vuelve pronto para empezar.</p></div>}
       </section>
+      {assessments.length>0 && <section className="assessment-links" aria-label="Evaluaciones del curso"><h2>Evalúa lo aprendido</h2>{assessments.map((assessment)=><Link key={assessment.id} className="assessment-link" href={`/cursos/${course.slug}/evaluaciones/${assessment.id}`}><span><strong>{assessment.title}</strong><small>Nota mínima: {assessment.passingScore}/20 · Resolver y consultar mis intentos</small></span><span aria-hidden="true">→</span></Link>)}</section>}
     </main>
   );
 }

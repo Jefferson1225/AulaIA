@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ChartNoAxesCombined, ChevronRight, Compass, GraduationCap, House, LogOut, Menu, Search, X } from "lucide-react";
+import { BookOpen, ChartNoAxesCombined, ChevronRight, ClipboardList, Compass, GraduationCap, House, LogOut, Menu, Search, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { Profile } from "../../domain/profile";
 
@@ -12,6 +12,7 @@ const navigation = [
   { href: "/catalogo", label: "Catálogo", icon: Compass },
   { href: "/inicio#mis-cursos", label: "Mi aprendizaje", icon: BookOpen },
   { href: "/inicio#progreso", label: "Progreso", icon: ChartNoAxesCombined },
+  { href: "/resultados", label: "Mis resultados", icon: ClipboardList },
 ];
 
 const roleLabels = { student: "Estudiante", teacher: "Docente", admin: "Administrador" };
