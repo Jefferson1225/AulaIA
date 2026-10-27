@@ -1,0 +1,13 @@
+.env*
+.git
+.github
+.next
+node_modules
+coverage
+.code-review-graph
+docs
+tests
+scripts
+supabase
+prolog
+*.tsbuildinfo

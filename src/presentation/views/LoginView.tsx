@@ -15,6 +15,7 @@ const statusMessages: Record<string, string> = {
   credenciales_invalidas: "Correo o contraseña incorrectos.",
   registro_fallido: "No pudimos crear la cuenta. Revisa los datos e inténtalo de nuevo.",
   confirma_correo: "Cuenta creada. Revisa tu correo para confirmarla antes de iniciar sesión.",
+  confirmacion_fallida: "El enlace de confirmación no es válido o ya venció. Si ya confirmaste tu correo, inicia sesión.",
 };
 
 export function LoginView({ configured, demoAvailable, mode = "login", status, action }: AuthViewProps) {
@@ -44,8 +45,8 @@ export function LoginView({ configured, demoAvailable, mode = "login", status, a
           {status && statusMessages[status] && <p className="auth-feedback" role="status">{statusMessages[status]}</p>}
           <form action={action} className="auth-fields">
             {registering && <><label htmlFor="auth-name">Nombre completo</label><input id="auth-name" name="fullName" type="text" autoComplete="name" required disabled={!configured} /></>}
-            <label htmlFor="auth-email">Correo electrónico</label>
-            <input id="auth-email" name="email" type="email" autoComplete="email" placeholder="tucorreo@ejemplo.com" required disabled={!configured} />
+            <label htmlFor="auth-email">{registering ? "Correo electrónico" : "Correo electrónico o usuario"}</label>
+            <input id="auth-email" name="email" type={registering ? "email" : "text"} autoComplete={registering ? "email" : "username"} placeholder={registering ? "tucorreo@ejemplo.com" : "Correo o usuario"} required disabled={!configured} />
             <label htmlFor="auth-password">Contraseña</label>
             <input id="auth-password" name="password" type="password" autoComplete={registering ? "new-password" : "current-password"} minLength={registering ? 8 : undefined} required disabled={!configured} />
             {configured && <button className="button button-primary auth-demo-button" type="submit">{registering ? "Crear cuenta" : "Iniciar sesión"} <ArrowRight size={18} /></button>}

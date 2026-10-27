@@ -29,6 +29,14 @@ Las evaluaciones admiten hasta 50 preguntas de cuatro alternativas, con una resp
 
 Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
 
+### Contenido de la primera entrega
+
+Los seis cursos publicados incluyen dos módulos y cuatro lecciones cada uno, con explicaciones, ejemplos y actividades de práctica. Las siete evaluaciones reúnen 21 preguntas. El curso de Python conserva su primera evaluación y añade otra de decisiones y funciones. La duración indicada es de dos horas por curso introductorio, incluyendo práctica.
+
+La migración `20261027010000_initial_learning_content.sql` carga este contenido sin reemplazar lecciones, preguntas ni intentos existentes. Puede repetirse sin duplicar registros. La administración permite ampliar y editar el contenido desde la aplicación; las evaluaciones con intentos conservan sus restricciones de edición.
+
+El acceso acepta un correo o los usuarios de demostración `alumno1`, `alumno2` y `profesor1`. Se autentican con Supabase y su contraseña; el nombre corto no evita ninguna comprobación de sesión. Las cuentas y sus credenciales se configuran fuera de Git. `profesor1` tiene gestión de contenido; los alumnos solo acceden a sus propias matrículas, progreso y resultados. Los datos de esas cuentas representan escenarios de prueba.
+
 El tutor exige sesión, matrícula y una lección publicada. Obtiene el contexto desde Supabase y añade el avance del estudiante y hasta tres intercambios anteriores de la misma conversación. El navegador no puede enviar mensajes de sistema ni historiales fabricados. Las respuestas se guardan antes de confirmarlas y se recuperan al abrir de nuevo la lección. Cada respuesta admite una valoración útil o un reporte con comentario. El contenido Markdown se presenta sin HTML, enlaces ni imágenes externas generadas por el modelo.
 
 ## Tecnologías
@@ -164,3 +172,17 @@ El script exige un tope configurado de hasta USD 0.02, registra respuestas y mé
 3. Desplegar en Vercel y validar la configuración de producción.
 
 Proyecto desarrollado con fines académicos. La estructura permite incorporar estas funciones de forma gradual.
+
+## Publicación en Vercel
+
+El proyecto utiliza Node.js 24 y el pnpm indicado en `packageManager`. En Vercel configura `ENABLE_EXPERIMENTAL_COREPACK=1`, además de las variables de `.env.example`. Las claves del proveedor y del servidor de Supabase deben registrarse como variables privadas de producción. `.vercelignore` excluye credenciales, dependencias locales y archivos de verificación de la carga de despliegue.
+
+Define `NEXT_PUBLIC_APP_URL` con la URL HTTPS de producción, sin barra final. En Supabase Auth configura esa misma dirección como Site URL y permite `https://tu-dominio/auth/callback` en Redirect URLs. La aplicación intercambia el código de confirmación por una sesión y dirige al estudiante a su inicio. Mantén también la URL de localhost si se continuará desarrollando localmente.
+
+Para actualizar una publicación vinculada mediante Vercel CLI, ejecuta desde la carpeta del proyecto, después de verificar los cambios:
+
+```bash
+pnpm dlx vercel@65.2.0 --prod
+```
+
+Este despliegue desde la copia local no hace push al repositorio. La integración automática con GitHub se configura por separado cuando se decida activar ese flujo.

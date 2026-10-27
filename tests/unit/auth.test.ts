@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { validateLogin, validateRegistration } from "../../src/application/auth";
+import { resolveLoginEmail, validateLogin, validateRegistration } from "../../src/application/auth";
 
 describe("validación de acceso", () => {
+  it("resuelve solo los usuarios de demostración sin alterar correos personales", () => {
+    expect(resolveLoginEmail(" Alumno1 ")).toBe("alumno1@demo.aulaia.test");
+    expect(resolveLoginEmail("profesor1")).toBe("profesor1@demo.aulaia.test");
+    expect(resolveLoginEmail("persona@ejemplo.com")).toBe("persona@ejemplo.com");
+    expect(validateLogin(resolveLoginEmail("administrador-inventado"), "clave")).not.toBeNull();
+  });
   it("rechaza credenciales incompletas antes de llamar a Supabase", () => {
     expect(validateLogin("correo-invalido", "123")).toBe("Ingresa un correo válido.");
     expect(validateLogin("persona@ejemplo.com", "")).toBe("Ingresa tu contraseña.");
