@@ -2,6 +2,8 @@
 
 AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Incorpora un Tutor IA contextual dentro de cada lección, con conversaciones persistentes, valoración de respuestas y control de consumo. El repositorio incluye acceso, perfiles, catálogo, gestión de contenido, matrículas, progreso, evaluaciones y resultados.
 
+Primera entrega disponible en [AulaIA](https://aulaia-ivory.vercel.app). El acceso a los cursos requiere iniciar sesión.
+
 ## Estado actual
 
 Se pueden recorrer las siguientes vistas:
@@ -49,7 +51,7 @@ El tutor exige sesión, matrícula y una lección publicada. Obtiene el contexto
 | Iconos | Lucide React |
 | Autenticación y perfiles | Supabase Auth y PostgreSQL con RLS |
 | Tutor IA | DeepSeek API, modelo `deepseek-flash` por defecto |
-| Despliegue previsto | Vercel |
+| Despliegue | Vercel |
 | Pruebas | Vitest y Testing Library |
 | Pruebas de base de datos | PGlite, con PostgreSQL y simulación de los roles de Supabase |
 | Gestor de paquetes | pnpm |
@@ -135,7 +137,7 @@ DeepSeek es opcional para probar matrículas, avance y evaluaciones. Para activa
 | `SUPABASE_SERVICE_ROLE_KEY` | Clave de servidor de Supabase; acepta la clave secreta actual del proyecto o la legacy `service_role` |
 | `TUTOR_MAX_BUDGET_USD` | Tope acumulado del proyecto en USD; el ejemplo usa `0.02`; `0` desactiva consultas nuevas |
 
-La clave de servidor y la de DeepSeek nunca deben llevar el prefijo `NEXT_PUBLIC_`. Reinicia el servidor tras modificar variables. Configura las mismas variables privadas y públicas en Vercel cuando se prepare el despliegue.
+La clave de servidor y la de DeepSeek nunca deben llevar el prefijo `NEXT_PUBLIC_`. Reinicia el servidor tras modificar variables. Configura las mismas variables privadas y públicas en Vercel para cada entorno de despliegue.
 
 Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; para gestionar contenido hay que asignar `admin` a una cuenta desde el editor SQL de Supabase, después de verificar su UUID en Authentication. No se cambia el rol desde el formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
 
@@ -169,11 +171,13 @@ El script exige un tope configurado de hasta USD 0.02, registra respuestas y mé
 
 1. Ampliar el contenido académico y validar el prototipo con estudiantes y docentes.
 2. Refinar los prompts y revisar periódicamente respuestas, reportes y tarifas del proveedor.
-3. Desplegar en Vercel y validar la configuración de producción.
+3. Mantener la publicación en Vercel y verificar cada actualización antes de desplegarla.
 
 Proyecto desarrollado con fines académicos. La estructura permite incorporar estas funciones de forma gradual.
 
 ## Publicación en Vercel
+
+La primera entrega está publicada en `https://aulaia-ivory.vercel.app`. Se comprobaron el inicio de sesión de alumno y administrador, la gestión de cursos y métricas y una consulta del tutor con recuperación de su conversación después de recargar la página. Los registros de demostración permiten probar el recorrido; no representan una validación con estudiantes reales.
 
 El proyecto utiliza Node.js 24 y el pnpm indicado en `packageManager`. En Vercel configura `ENABLE_EXPERIMENTAL_COREPACK=1`, además de las variables de `.env.example`. Las claves del proveedor y del servidor de Supabase deben registrarse como variables privadas de producción. `.vercelignore` excluye credenciales, dependencias locales y archivos de verificación de la carga de despliegue.
 
