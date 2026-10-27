@@ -1,6 +1,6 @@
 # AulaIA
 
-AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Su propuesta incorpora un Tutor IA contextual dentro de cada lección. El repositorio incluye acceso, perfiles, catálogo, gestión de contenido, matrículas, progreso, evaluaciones y resultados.
+AulaIA es una plataforma web de aprendizaje virtual para gestionar cursos, lecciones, evaluaciones y progreso académico. Incorpora un Tutor IA contextual dentro de cada lección, con conversaciones persistentes, valoración de respuestas y control de consumo. El repositorio incluye acceso, perfiles, catálogo, gestión de contenido, matrículas, progreso, evaluaciones y resultados.
 
 ## Estado actual
 
@@ -12,6 +12,7 @@ Se pueden recorrer las siguientes vistas:
 | `/registro` | Registro | Alta de estudiantes por correo y contraseña |
 | `/inicio` | Inicio del estudiante | Matrículas, progreso, siguiente lección pendiente y recomendaciones desde Supabase |
 | `/catalogo` | Catálogo | Cursos publicados y categorías desde Supabase, con búsqueda y filtros |
+| `/admin/tutor` | Seguimiento del asistente | Consultas, fallos, latencia media, tokens, costo estimado y valoraciones; acceso administrativo |
 | `/cursos/[curso]` | Detalle de curso | Contenido publicado, matrícula y resumen del avance propio |
 | `/cursos/[curso]/lecciones/[leccion]` | Lección | Contenido persistente, marcar o desmarcar como completada y Tutor IA al configurar DeepSeek |
 | `/admin/cursos` | Gestión de contenido | Crear, editar y publicar cursos; administrar módulos y lecciones con rol `admin` |
@@ -28,6 +29,8 @@ Las evaluaciones admiten hasta 50 preguntas de cuatro alternativas, con una resp
 
 Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
 
+El tutor exige sesión, matrícula y una lección publicada. Obtiene el contexto desde Supabase y añade el avance del estudiante y hasta tres intercambios anteriores de la misma conversación. El navegador no puede enviar mensajes de sistema ni historiales fabricados. Las respuestas se guardan antes de confirmarlas y se recuperan al abrir de nuevo la lección. Cada respuesta admite una valoración útil o un reporte con comentario. El contenido Markdown se presenta sin HTML, enlaces ni imágenes externas generadas por el modelo.
+
 ## Tecnologías
 
 | Área | Tecnología |
@@ -40,6 +43,7 @@ Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. 
 | Tutor IA | DeepSeek API, modelo `deepseek-flash` por defecto |
 | Despliegue previsto | Vercel |
 | Pruebas | Vitest y Testing Library |
+| Pruebas de base de datos | PGlite, con PostgreSQL y simulación de los roles de Supabase |
 | Gestor de paquetes | pnpm |
 
 ## Diseño por capas
@@ -84,9 +88,10 @@ AulaIA/
 │       ├── supabase/               Cliente SSR, perfiles, contenido, avance y evaluaciones
 │       └── deepseek/               Cliente del Tutor IA
 ├── supabase/
-│   ├── migrations/                Perfiles, contenido, avance, evaluaciones y políticas RLS
+│   ├── migrations/                Perfiles, contenido, avance, evaluaciones, tutor y políticas RLS
 │   └── tests/                     Comprobaciones SQL de aislamiento y relaciones
 ├── prolog/                         Reservado para representación lógica
+├── scripts/                        Verificación SQL y evaluación optativa del tutor
 └── tests/
     ├── unit/                       Reglas de aplicación
     └── integration/                Comportamiento de las vistas
@@ -111,9 +116,22 @@ pnpm install
 pnpm dev
 ```
 
-Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden y habilita el proveedor de correo en Authentication. `20261026000000_assessments.sql` requiere las migraciones de contenido y matrículas; incluye una evaluación de muestra en el curso de Python. Configura las URL de redirección de localhost y del despliegue. DeepSeek es opcional para probar matrículas, avance y evaluaciones; para activar el tutor añade `DEEPSEEK_API_KEY`. Configura las mismas variables en Vercel. No agregues credenciales al repositorio.
+Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden y habilita el proveedor de correo en Authentication. Las migraciones son incrementales: en una base existente aplica solo las pendientes. `20261026000000_assessments.sql` requiere contenido y matrículas e incluye una evaluación de muestra en Python. `20261027000000_tutor_persistence.sql` incorpora historial, control de gasto y valoraciones. Configura las URL de redirección de localhost y del despliegue.
+
+DeepSeek es opcional para probar matrículas, avance y evaluaciones. Para activar el tutor configura estas variables privadas:
+
+| Variable | Uso |
+|---|---|
+| `DEEPSEEK_API_KEY` | Clave del proveedor, utilizada únicamente en el servidor |
+| `DEEPSEEK_MODEL` | `deepseek-flash`; cambiar de modelo requiere revisar las tarifas y la reserva |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave de servidor de Supabase; acepta la clave secreta actual del proyecto o la legacy `service_role` |
+| `TUTOR_MAX_BUDGET_USD` | Tope acumulado del proyecto en USD; el ejemplo usa `0.02`; `0` desactiva consultas nuevas |
+
+La clave de servidor y la de DeepSeek nunca deben llevar el prefijo `NEXT_PUBLIC_`. Reinicia el servidor tras modificar variables. Configura las mismas variables privadas y públicas en Vercel cuando se prepare el despliegue.
 
 Supabase puede pedir confirmación por correo al registrarse, según la configuración del proyecto. Las cuentas nuevas reciben rol `student`; para gestionar contenido hay que asignar `admin` a una cuenta desde el editor SQL de Supabase, después de verificar su UUID en Authentication. No se cambia el rol desde el formulario público. La política RLS permite leer el perfil propio y editar únicamente el nombre. El Tutor IA tiene un máximo de 30 preguntas por usuario y día UTC, aplicado en PostgreSQL para compartir el límite entre instancias.
+
+La admisión del tutor reserva el costo antes de llamar al proveedor, serializa el cálculo de presupuesto entre instancias y bloquea consultas simultáneas del mismo usuario durante 60 segundos. Usa Flash sin razonamiento, respuestas de hasta 512 tokens y un tiempo máximo de 30 segundos para la llamada. No hay reintentos automáticos. Los fallos sin consumo confirmado conservan la reserva; una interrupción puede dejar una consulta pendiente y los fondos retenidos para revisión. Un registro privado sin datos del estudiante conserva los importes aunque se elimine una cuenta o lección. El tope no se reinicia cada día y es independiente del saldo de DeepSeek. La estimación usa las tarifas máximas verificadas el 26/10/2026 y debe revisarse si el proveedor las modifica.
 
 ## Verificación
 
@@ -121,15 +139,28 @@ Supabase puede pedir confirmación por correo al registrarse, según la configur
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:db
 pnpm build
 ```
 
-Las pruebas cubren el catálogo, el avance, las vistas, los formularios y las acciones de envío de evaluaciones, las validaciones y el contexto del Tutor IA. Los scripts de `supabase/tests/` comprueban matrículas, aislamiento entre usuarios, permisos de edición, calificación, versiones y conservación de resultados en una base PostgreSQL de pruebas con las migraciones aplicadas. El flujo completo de correo, sesión y API de Supabase se valida con un proyecto configurado.
+Las pruebas cubren catálogo, avance, vistas, formularios, envío de evaluaciones, contexto e historial del tutor, consumo y errores del proveedor. `pnpm test:db` crea una base efímera, aplica todas las migraciones y ejecuta `supabase/tests/`: aislamiento entre usuarios, permisos, calificación, versiones, presupuesto, cupo, conservación del consumo y valoraciones. No utiliza el proyecto remoto ni llama a DeepSeek.
+
+`node scripts/verify-supabase.mjs` permite verificar el proyecto remoto con dos cuentas sintéticas dedicadas. Requiere `AULAIA_TEST_ACCOUNTS` apuntando a un JSON local con dos objetos `{ "id", "email", "password" }`, y `AULAIA_LIVE_OUTPUT` como ruta de salida externa al repositorio. Solo admite correos con prefijo `aulaia-cap2-` y dominio `example.invalid`. Las cuentas deben crearse para pruebas y tener correo confirmado. El script matricula esas cuentas, registra avance e intentos y comprueba aislamiento; no envía correos ni consulta la IA.
+
+### Evaluación optativa del asistente
+
+Los 12 casos de `tests/evaluation/tutor-cases.json` cubren conceptos, ejemplos, continuidad, información insuficiente, preguntas ajenas al tema e instrucciones adversarias. `node scripts/evaluate-tutor.mjs` muestra la preparación sin efectuar consultas. Para ejecutar llamadas reales, con Node.js 24, servidor local activo y una cuenta de prueba, configura `EVAL_EMAIL`, `EVAL_PASSWORD` y `EVAL_OUTPUT` (archivo externo al repositorio), y ejecuta:
+
+```bash
+node scripts/evaluate-tutor.mjs --run
+```
+
+El script exige un tope configurado de hasta USD 0.02, registra respuestas y métricas, y se detiene ante el primer rechazo o fallo. Los casos no se califican automáticamente como correctos: sus criterios deben contrastarse con las respuestas. Una muestra pequeña de desarrollo no mide satisfacción de estudiantes ni mejora del aprendizaje. Las credenciales, respuestas de evaluación y capturas locales no se incorporan al repositorio.
 
 ## Siguientes etapas
 
-1. Validar el recorrido completo con cuentas reales y ampliar las pruebas de integración con Supabase.
-2. Completar el contenido académico y la revisión del Tutor IA.
+1. Ampliar el contenido académico y validar el prototipo con estudiantes y docentes.
+2. Refinar los prompts y revisar periódicamente respuestas, reportes y tarifas del proveedor.
 3. Desplegar en Vercel y validar la configuración de producción.
 
 Proyecto desarrollado con fines académicos. La estructura permite incorporar estas funciones de forma gradual.

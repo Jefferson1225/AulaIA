@@ -4,12 +4,14 @@ import { ArrowLeft, BookOpen, ChevronRight, Clock3, Lightbulb, LockKeyhole, Mess
 import type { Lesson } from "../../domain/course";
 import { TutorChat } from "../components/TutorChat";
 import type { CourseProgress } from "../../domain/learning";
+import type { TutorTurn } from "../../domain/tutor";
 import { LearningSubmitButton } from "../components/LearningSubmitButton";
 import { LearningFeedback } from "../components/LearningFeedback";
 
-export function LessonView({ lesson, tutorAvailable = false, progress, completionAction, status }: {
+export function LessonView({ lesson, tutorAvailable = false, tutorInitialTurns, progress, completionAction, status }: {
   lesson: Lesson;
   tutorAvailable?: boolean;
+  tutorInitialTurns?: TutorTurn[];
   progress?: CourseProgress;
   completionAction?: (form: FormData) => Promise<void>;
   status?: string;
@@ -71,7 +73,7 @@ export function LessonView({ lesson, tutorAvailable = false, progress, completio
             </div>
           </article>
         </main>
-        {tutorAvailable ? <TutorChat courseSlug={lesson.courseSlug} lessonSlug={lesson.slug} lessonTitle={lesson.title} /> : <aside className="tutor-panel">
+        {tutorAvailable ? <TutorChat key={`${lesson.courseSlug}/${lesson.slug}`} courseSlug={lesson.courseSlug} lessonSlug={lesson.slug} lessonTitle={lesson.title} initialTurns={tutorInitialTurns} /> : <aside className="tutor-panel">
           <div className="tutor-heading"><span className="tutor-icon"><Sparkles size={21} /></span><div><strong>Tutor IA · Vista previa</strong><small>Contexto: {lesson.title}</small></div></div>
           <div className="tutor-conversation">
             <div className="tutor-intro"><MessageCircle size={20} /><p>Este panel acompañará al estudiante mientras estudia la lección.</p></div>

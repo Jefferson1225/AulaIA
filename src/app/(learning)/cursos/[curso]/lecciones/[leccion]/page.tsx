@@ -10,6 +10,7 @@ import { buildCourseProgress } from "../../../../../../application/learning-prog
 import { requireLearningUser } from "../../../../../../infrastructure/supabase/learning-access";
 import { createLearningRepository } from "../../../../../../infrastructure/supabase/learning-repository";
 import { setLessonCompletedAction } from "../../../actions";
+import { readTutorHistory } from "../../../../../../infrastructure/supabase/tutor-repository";
 
 export const metadata: Metadata = { title: "Lección · AulaIA" };
 
@@ -21,8 +22,8 @@ export default async function LessonPage({ params, searchParams }: { params: Pro
     if (!course) notFound();
     const lesson = findLessonInCourse(course, leccion);
     if (!lesson) notFound();
-    const [snapshot, query] = await Promise.all([createLearningRepository(client, user.id).read(), searchParams]);
-    return <LessonView lesson={lesson} tutorAvailable={Boolean(process.env.DEEPSEEK_API_KEY)} progress={buildCourseProgress(course, snapshot)} completionAction={setLessonCompletedAction} status={query.estado} />;
+    const [snapshot, query, turns] = await Promise.all([createLearningRepository(client, user.id).read(), searchParams, readTutorHistory(client, user.id, curso, leccion)]);
+    return <LessonView lesson={lesson} tutorAvailable={Boolean(process.env.DEEPSEEK_API_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY)} tutorInitialTurns={turns} progress={buildCourseProgress(course, snapshot)} completionAction={setLessonCompletedAction} status={query.estado} />;
   }
   const lesson = await getLesson(demoCourseRepository, curso, leccion);
   if (!lesson) notFound();

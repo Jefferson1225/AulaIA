@@ -13,4 +13,13 @@ describe("Tutor IA", () => {
     expect(request.question).toBe("¿Qué es una variable?");
     expect(() => prepareTutorQuestion(lesson, "x".repeat(1001), "Fundamentos de Python")).toThrow("Pregunta demasiado larga.");
   });
+  it("acota el contenido para no enviar lecciones arbitrariamente grandes", async () => {
+    const lesson = await demoCourseRepository.findLesson("fundamentos-python", "variables-y-tipos");
+    if (!lesson) throw new Error("Falta la lección");
+    lesson.sections = [{ title: "Tema", text: "x".repeat(50000) }];
+    const prompt = prepareTutorQuestion(lesson, " Explica ", "Python", { completedLessons: 1, totalLessons: 4 });
+    expect(prompt.system.length).toBeLessThan(7500);
+    expect(prompt.system).toContain("1 de 4");
+    expect(prompt.question).toBe("Explica");
+  });
 });

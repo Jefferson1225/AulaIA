@@ -11,6 +11,7 @@ export function AdminShell({ children, signOutAction }: { children: ReactNode; s
         <nav aria-label="Navegación de administración">
           <Link href="/admin/cursos">Cursos y contenido</Link>
           <Link href="/admin/evaluaciones">Evaluaciones</Link>
+          <Link href="/admin/tutor">Métricas del Tutor IA</Link>
           <Link href="/catalogo">Ver catálogo</Link>
           <Link href="/inicio">Inicio del estudiante</Link>
         </nav>
