@@ -252,6 +252,26 @@ a { color: inherit; text-decoration: none; }
 .tutor-input-row button { padding: 0 12px; border: 0; border-radius: 9px; background: var(--accent); color: var(--foreground); font-size: 11px; font-weight: 700; }
 .tutor-input-row button:disabled { opacity: .5; cursor: not-allowed; }
 .tutor-wait { color: var(--muted); font-size: 11px; }
+.tutor-message-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tutor-answer { overflow-wrap: anywhere; }
+.tutor-answer p { margin: 0 0 10px; }
+.tutor-answer p:last-child { margin-bottom: 0; }
+.tutor-answer pre { overflow-x: auto; padding: 10px; border-radius: 6px; background: #2e2925; color: #fff4e8; }
+.tutor-answer ul, .tutor-answer ol { padding-left: 20px; }
+.tutor-answer h1, .tutor-answer h2, .tutor-answer h3, .tutor-answer h4 { margin: 10px 0 6px; font-size: 12px; }
+.tutor-tools { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.tutor-tools button, .tutor-feedback button { padding: 6px 8px; border: 1px solid #e6c8b5; border-radius: 6px; background: #fffaf5; color: #78472e; font-size: 10px; cursor: pointer; }
+.tutor-tools button:disabled, .tutor-feedback button:disabled { opacity: .5; cursor: wait; }
+.tutor-feedback { margin-top: 12px; padding-top: 8px; border-top: 1px solid #e6c8b5; }
+.tutor-feedback > div:first-child { display: flex; flex-wrap: wrap; gap: 6px; }
+.tutor-feedback button[aria-pressed="true"] { background: #f5d9c4; border-color: #a66b48; }
+.tutor-feedback small { display: block; margin-top: 6px; }
+.tutor-report label { display: block; margin-top: 8px; }
+.tutor-report textarea { width: 100%; margin: 5px 0; padding: 7px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--foreground); }
+.tutor-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 14px; }
+.tutor-metrics > div { padding: 18px; border: 1px solid var(--border); border-radius: 12px; }
+.tutor-metrics dt { font-size: 12px; color: var(--muted); }
+.tutor-metrics dd { margin: 8px 0 0; font-size: 24px; font-weight: 700; }
 
 @media (max-width: 1190px) {
   .learning-grid { grid-template-columns: 210px minmax(0, 1fr) 280px; }
