@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { findLessonInCourse } from "../../src/application/content-access";
-import { mapPublishedCourse } from "../../src/infrastructure/supabase/content-mapper";
+import { findLessonInCourse } from "../../backend/src/application/content-access";
+import { mapPublishedCourse } from "../../backend/src/infrastructure/supabase/content-mapper";
 
 describe("adaptador de cursos y lecciones", () => {
   it("ordena módulos y lecciones y entrega el contenido al recorrido del estudiante", () => {

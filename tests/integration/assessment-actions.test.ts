@@ -1,14 +1,14 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { submitAssessmentAction } from "../../src/app/(learning)/cursos/evaluation-actions";
+import { submitAssessmentAction } from "../../backend/src/interfaces/actions/assessments";
 import { exampleAssessment,exampleAttempt,exampleQuestions } from "../fixtures/assessments";
 
 const session=vi.hoisted(()=>({ user:{ id:"session-owner" } as { id: string }|null, client:null as SupabaseClient|null }));
 vi.mock("next/navigation",()=>({redirect:(path: string)=>{throw new Error(`redirect:${path}`);}}));
 vi.mock("next/cache",()=>({revalidatePath:()=>{}}));
-vi.mock("../../src/infrastructure/supabase/config",()=>({getSupabaseConfig:()=>({url:"https://aulaia.example",key:"test-public-key"})}));
-vi.mock("../../src/infrastructure/supabase/server",()=>({createSupabaseServerClient:async()=>({auth:{getUser:async()=>({data:{user:session.user},error:null})},from:session.client!.from.bind(session.client),rpc:session.client!.rpc.bind(session.client)})}));
+vi.mock("../../backend/src/infrastructure/supabase/config",()=>({getSupabaseConfig:()=>({url:"https://aulaia.example",key:"test-public-key"})}));
+vi.mock("../../backend/src/infrastructure/supabase/server",()=>({createSupabaseServerClient:async()=>({auth:{getUser:async()=>({data:{user:session.user},error:null})},from:session.client!.from.bind(session.client),rpc:session.client!.rpc.bind(session.client)})}));
 
 const requests: { url:string; body:Record<string,unknown>|null }[]=[];
 let rejected=false;

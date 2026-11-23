@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { buildCourseProgress, buildLearningDashboard, parseCompletionInput } from "../../src/application/learning-progress";
+import { buildCourseProgress, buildLearningDashboard, parseCompletionInput } from "../../backend/src/application/learning-progress";
 import { learningCourse, enrolledSnapshot } from "../fixtures/learning";
-import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
+import { demoCourseRepository } from "../../backend/src/infrastructure/demo/course-repository";
 
 describe("matrículas y progreso", () => {
   it("calcula el avance sin duplicados, lecciones eliminadas ni completadas en otro curso", () => {
@@ -57,5 +57,14 @@ describe("matrículas y progreso", () => {
     expect(dashboard.continueLesson).toEqual({ title: "Tomar mediciones", href: "/cursos/robotica-basica/lecciones/mediciones" });
     expect(dashboard.recommendedCourses.map((course) => course.slug)).toEqual(["fundamentos-python"]);
     expect(dashboard.activities[0].href).toBe("/cursos/robotica-basica/lecciones/mediciones");
+  });
+
+  it("retoma un curso con actividad reciente antes que otro que aún no empezó", async () => {
+    const [sample] = await demoCourseRepository.list();
+    const unstarted = { ...learningCourse, slug: "curso-nuevo" };
+    const courses = [{ ...sample, slug: unstarted.slug }, { ...sample, slug: learningCourse.slug }];
+    const snapshot = { ...enrolledSnapshot, enrollments: [{ courseSlug: unstarted.slug, enrolledAt: "2026-10-20" }, ...enrolledSnapshot.enrollments] };
+    const dashboard = buildLearningDashboard(courses, [unstarted, learningCourse], snapshot);
+    expect(dashboard.continueLesson?.href).toBe("/cursos/robotica-basica/lecciones/mediciones");
   });
 });

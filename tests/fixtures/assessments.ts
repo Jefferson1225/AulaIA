@@ -1,4 +1,4 @@
-import type { Assessment, AssessmentAttempt, AssessmentQuestion } from "../../src/domain/assessment";
+import type { Assessment, AssessmentAttempt, AssessmentQuestion } from "../../backend/src/domain/assessment";
 export const exampleAssessment: Assessment = {
   id: "ea100000-0000-4000-8000-000000000001", courseSlug: "fundamentos-python", title: "Variables y tipos de datos", description: "Comprueba lo aprendido", passingScore: 12, isPublished: true, version: 1,
 };

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { filterCourses } from "../../src/application/course-catalog";
-import { getStudentDashboard } from "../../src/application/student-dashboard";
-import { getLesson } from "../../src/application/lesson";
-import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
+import { filterCourses } from "../../backend/src/application/course-catalog";
+import { getStudentDashboard } from "../../backend/src/application/student-dashboard";
+import { getLesson } from "../../backend/src/application/lesson";
+import { demoCourseRepository } from "../../backend/src/infrastructure/demo/course-repository";
 
 describe("recorrido de demostración del estudiante", () => {
   it("filtra el catálogo por búsqueda, categoría y nivel", async () => {

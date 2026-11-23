@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapCatalogCourses } from "../../src/infrastructure/supabase/catalog-mapper";
+import { mapCatalogCourses } from "../../backend/src/infrastructure/supabase/catalog-mapper";
 
 describe("adaptador del catálogo", () => {
   it("convierte cursos publicados en tarjetas con su categoría y sin progreso ficticio", () => {

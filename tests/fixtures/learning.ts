@@ -1,4 +1,4 @@
-import type { PublishedCourse } from "../../src/domain/content";
+import type { PublishedCourse } from "../../backend/src/domain/content";
 
 export const learningCourse: PublishedCourse = {
   slug: "robotica-basica", title: "Robótica básica", description: "Sensores y movimiento", level: "principiante",

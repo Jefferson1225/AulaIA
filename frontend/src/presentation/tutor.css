@@ -1,0 +1,139 @@
+.floating-tutor {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 60;
+  font-family: "Inter", sans-serif;
+}
+.tutor-launcher {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 1px solid #963716;
+  border-radius: 50%;
+  background: #ad431f;
+  color: #fff;
+  box-shadow: 0 8px 28px #652c2330, 0 0 0 5px #ffffffb3;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+.tutor-launcher:hover { transform: translateY(-2px); background: #923515; }
+.tutor-launcher-caption {
+  position: absolute;
+  right: 75px;
+  padding: 8px 12px;
+  border: 1px solid #eaded5;
+  border-radius: 10px;
+  background: #fff;
+  color: #59483e;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+.tutor-launcher:hover .tutor-launcher-caption, .tutor-launcher:focus-visible .tutor-launcher-caption { opacity: 1; }
+.floating-tutor button:focus-visible, .floating-tutor input:focus-visible, .floating-tutor textarea:focus-visible {
+  outline: 3px solid #a84720;
+  outline-offset: 3px;
+}
+.floating-tutor-panel {
+  position: absolute;
+  right: 0;
+  bottom: 78px;
+  display: flex;
+  width: min(390px, calc(100vw - 48px));
+  height: min(620px, calc(100dvh - 126px));
+  overflow: hidden;
+  border: 1px solid #cfd9ee;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 18px 65px #38251e26, 0 4px 16px #38251e0d;
+  animation: tutor-reveal .18s ease-out;
+}
+.floating-tutor-panel[hidden] { display: none; }
+.floating-tutor-panel .tutor-panel { width: 100%; height: 100%; min-height: 0; border: 0; }
+.floating-tutor-panel .tutor-heading { min-height: 84px; flex: none; padding: 18px 62px 18px 20px; background: #f7f8ff; }
+.floating-tutor-panel .tutor-icon { width: 42px; height: 42px; border: 1px solid #d8dcf5; border-radius: 14px; }
+.floating-tutor-panel .tutor-heading > div { min-width: 0; }
+.floating-tutor-panel .tutor-heading strong { font-family: "Manrope", sans-serif; font-size: 16px; }
+.floating-tutor-panel .tutor-heading small { overflow: hidden; font-size: 11px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.tutor-minimize {
+  position: absolute;
+  top: 20px;
+  right: 13px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #505b73;
+  cursor: pointer;
+}
+.tutor-minimize:hover { background: #ededff; color: #ad431f; }
+.floating-tutor-panel .tutor-tools { flex: none; gap: 8px; padding: 10px 18px; background: #fff; }
+.floating-tutor-panel .tutor-tools button { min-height: 36px; padding: 7px 10px; font-size: 11px; }
+.floating-tutor-panel .tutor-conversation { min-height: 0; overflow-y: auto; padding: 18px; overscroll-behavior: contain; scrollbar-width: thin; }
+.floating-tutor-panel .tutor-intro { align-items: center; margin-bottom: 20px; padding: 14px; }
+.floating-tutor-panel .tutor-intro p { font-size: 12px; line-height: 1.65; }
+.floating-tutor-panel .message { font-size: 13px; line-height: 1.7; }
+.floating-tutor-panel .message > span { font-size: 10px; }
+.floating-tutor-panel .message-ai code { font-size: 12px; }
+.floating-tutor-panel .tutor-bottom { flex: none; padding: 15px 18px 17px; background: #f9faff; }
+.floating-tutor-panel .tutor-bottom label { margin-bottom: 10px; font-size: 12px; }
+.floating-tutor-panel .tutor-input-row { gap: 9px; }
+.floating-tutor-panel .tutor-input-row input { height: 46px; font-size: 14px; }
+.floating-tutor-panel .tutor-input-row button { min-width: 67px; background: var(--accent); color: #fff; font-size: 12px; cursor: pointer; }
+.floating-tutor-panel .tutor-input-row button:disabled { cursor: not-allowed; }
+.floating-tutor-panel .tutor-feedback button { min-height: 36px; font-size: 11px; }
+.floating-tutor-panel .tutor-wait { font-size: 12px; }
+.tutor-invitation {
+  position: absolute;
+  right: 0;
+  bottom: 78px;
+  display: flex;
+  width: min(310px, calc(100vw - 48px));
+  padding: 6px;
+  border: 1px solid #d4def3;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 8px 32px #38251e1f;
+  animation: tutor-reveal .18s ease-out;
+}
+.tutor-invitation::after { content: ""; position: absolute; right: 22px; bottom: -6px; width: 10px; height: 10px; border-right: 1px solid #d4def3; border-bottom: 1px solid #d4def3; background: #fff; transform: rotate(45deg); }
+.tutor-invitation-content { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; padding: 13px 0 13px 10px; border: 0; border-radius: 11px; background: transparent; text-align: left; cursor: pointer; }
+.tutor-invitation-icon { display: grid; flex: none; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: #eeedff; color: #a84720; }
+.tutor-invitation strong { display: block; color: #3c2c23; font-size: 13px; }
+.tutor-invitation small { display: block; margin-top: 5px; color: #505b73; font-size: 11px; line-height: 1.5; }
+.tutor-invitation-dismiss { display: grid; flex: none; place-items: center; width: 36px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #505b73; cursor: pointer; }
+.tutor-invitation-dismiss:hover { background: #f0f2ff; }
+.tutor-preview-welcome { padding: 20px 12px; text-align: center; }
+.tutor-preview-bot { display: grid; place-items: center; width: 66px; height: 66px; margin: 0 auto 18px; border-radius: 22px; background: #eeedff; color: #a84720; }
+.tutor-preview-welcome h2 { margin: 0 0 10px; font-family: "Manrope", sans-serif; font-size: 18px; }
+.tutor-preview-welcome p { margin: 0; color: #505b73; font-size: 13px; line-height: 1.75; }
+@keyframes tutor-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) {
+  .floating-tutor { left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
+  .tutor-launcher { margin-left: auto; }
+  .floating-tutor-panel { bottom: 74px; width: 100%; height: min(620px, calc(100dvh - 108px)); border-radius: 18px; }
+  .floating-tutor-panel .tutor-input-row input { font-size: 16px; }
+  .lesson-main { padding-bottom: 100px; }
+}
+@media (max-height: 520px) {
+  .floating-tutor-panel .tutor-tools { display: none; }
+  .floating-tutor-panel .tutor-heading { min-height: 66px; padding-top: 10px; padding-bottom: 10px; }
+  .tutor-minimize { top: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tutor-launcher, .tutor-launcher-caption { transition: none; }
+  .tutor-launcher:hover { transform: none; }
+  .floating-tutor-panel, .tutor-invitation { animation: none; }
+}

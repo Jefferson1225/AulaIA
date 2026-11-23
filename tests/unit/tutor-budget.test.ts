@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateTutorCost, reserveTutorCost, summarizeTutorMetrics } from "../../src/application/tutor-metrics";
+import { estimateTutorCost, reserveTutorCost, summarizeTutorMetrics } from "../../backend/src/application/tutor-metrics";
 
 describe("Consumo y métricas del tutor", () => {
   it("estima el costo con la tarifa conservadora y reserva más que una respuesta breve", () => {

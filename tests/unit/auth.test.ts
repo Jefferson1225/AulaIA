@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveLoginEmail, validateLogin, validateRegistration } from "../../src/application/auth";
+import { resolveLoginEmail, validateLogin, validateRegistration } from "../../backend/src/application/auth";
 
 describe("validación de acceso", () => {
   it("resuelve solo los usuarios de demostración sin alterar correos personales", () => {

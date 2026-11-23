@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 const auth = vi.hoisted(() => ({ user: null as { id: string } | null }));
-vi.mock("../../src/infrastructure/supabase/server", () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: async () => ({ data: { user: auth.user }, error: null }) } }) }));
-import { POST } from "../../src/app/api/tutor/route";
+vi.mock("../../backend/src/infrastructure/supabase/server", () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: async () => ({ data: { user: auth.user }, error: null }) } }) }));
+import { POST } from "../../frontend/src/app/api/tutor/route";
 afterEach(() => { vi.unstubAllEnvs(); auth.user = null; });
 
 function configured() {
@@ -15,7 +15,7 @@ function configured() {
   vi.stubEnv("TUTOR_MAX_BUDGET_USD", "0.02");
 }
 describe("Entrada HTTP del tutor", () => {
-  it("exige sesión antes de acceder a la IA", async () => {
+  it("exige sesiÃ³n antes de acceder a la IA", async () => {
     configured();
     const response = await POST(new NextRequest("http://localhost/api/tutor", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }));
     expect(response.status).toBe(401);

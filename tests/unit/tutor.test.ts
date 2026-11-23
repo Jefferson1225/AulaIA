@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { prepareTutorQuestion } from "../../src/application/tutor";
-import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
+import { prepareTutorQuestion } from "../../backend/src/application/tutor";
+import { demoCourseRepository } from "../../backend/src/infrastructure/demo/course-repository";
 
 describe("Tutor IA", () => {
   it("utiliza el contenido de la lección y limita el tamaño de la pregunta", async () => {

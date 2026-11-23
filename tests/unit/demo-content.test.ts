@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { findLessonInCourse } from "../../src/application/content-access";
-import { getDemoPublishedCourse } from "../../src/infrastructure/demo/content-repository";
+import { findLessonInCourse } from "../../backend/src/application/content-access";
+import { getDemoPublishedCourse } from "../../backend/src/infrastructure/demo/content-repository";
 
 describe("contenido de demostración", () => {
   it("conserva la lección de Python sin Supabase y no inventa lecciones para otros cursos", async () => {

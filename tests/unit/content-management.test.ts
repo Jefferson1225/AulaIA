@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canManageContent, parseContentSlug, parseCourseInput, parseLessonInput, parseModuleInput } from "../../src/application/content-management";
+import { canManageContent, parseContentSlug, parseCourseInput, parseLessonInput, parseModuleInput } from "../../backend/src/application/content-management";
 
 describe("gestión de contenido académico", () => {
   it("reserva la edición para administradores", () => {

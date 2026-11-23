@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { askDeepSeek } from "../../src/infrastructure/deepseek/tutor";
+import { askDeepSeek } from "../../backend/src/infrastructure/deepseek/tutor";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 describe("Proveedor DeepSeek", () => {

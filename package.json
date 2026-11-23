@@ -2,16 +2,18 @@
   "name": "aulaia",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": "24.x" },
+  "engines": {
+    "node": "24.x"
+  },
   "packageManager": "pnpm@11.19.0",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "pnpm --dir frontend dev",
+    "build": "pnpm --dir frontend build",
+    "start": "pnpm --dir frontend start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:db": "node scripts/test-database.mjs"
+    "test:db": "node backend/scripts/test-database.mjs"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^3.0.45",

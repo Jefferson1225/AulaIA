@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseAssessmentInput, parseQuestionInput, parseSubmission, submissionFromForm } from "../../src/application/assessments";
+import { parseAssessmentInput, parseQuestionInput, parseSubmission, submissionFromForm } from "../../backend/src/application/assessments";
 
 const assessmentId = "ea000000-0000-4000-8000-000000000001";
 const questionId = "ea000000-0000-4000-8000-000000000002";

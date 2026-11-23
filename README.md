@@ -17,6 +17,7 @@ Se pueden recorrer las siguientes vistas:
 | `/admin/tutor` | Seguimiento del asistente | Consultas, fallos, latencia media, tokens, costo estimado y valoraciones; acceso administrativo |
 | `/cursos/[curso]` | Detalle de curso | Contenido publicado, matrícula y resumen del avance propio |
 | `/cursos/[curso]/lecciones/[leccion]` | Lección | Contenido persistente, marcar o desmarcar como completada y Tutor IA al configurar DeepSeek |
+| `/admin` | Panel de administración | Accesos a contenido, evaluaciones y métricas del tutor con rol `admin` |
 | `/admin/cursos` | Gestión de contenido | Crear, editar y publicar cursos; administrar módulos y lecciones con rol `admin` |
 | `/admin/evaluaciones` | Gestión de evaluaciones | Crear borradores, administrar preguntas y publicar con rol `admin` |
 | `/cursos/[curso]/evaluaciones/[evaluacion]` | Evaluación | Responder preguntas de opción múltiple y consultar intentos propios |
@@ -27,7 +28,7 @@ La ruta `/` abre `/inicio`. Con Supabase configurado, las rutas de estudiante y 
 
 El porcentaje de avance se calcula con las lecciones actuales del curso, sin almacenar un porcentaje editable por el navegador. Las claves compuestas impiden duplicar matrículas y completados. Las políticas RLS restringen el avance a su propietario y exigen una matrícula para completar lecciones. Si se elimina una lección, se elimina su completado asociado; si se agrega contenido, el avance se recalcula. Las actividades del inicio son lecciones pendientes reales.
 
-Las evaluaciones admiten hasta 50 preguntas de cuatro alternativas, con una respuesta correcta por pregunta. PostgreSQL comprueba la matrícula y calcula `aciertos × 20 / preguntas`, con dos decimales y un mínimo aprobatorio configurable entre 1 y 20. Las claves correctas se guardan en un esquema privado sin permisos para los clientes. Los intentos conservan una copia de las preguntas respondidas y el criterio de aprobación. Cada envío tiene un identificador para evitar duplicados y una versión para rechazar formularios anteriores a una edición. Solo se editan borradores sin intentos; despublicar conserva el historial. El menú “Mis resultados” permite recuperar los intentos anteriores.
+Las evaluaciones se habilitan cuando el estudiante está matriculado y ha completado todas las lecciones actuales de un curso con contenido. PostgreSQL aplica esa condición al leer preguntas y al enviar un intento. Admite hasta 50 preguntas de cuatro alternativas y calcula `aciertos × 20 / preguntas`, con dos decimales y un mínimo aprobatorio configurable entre 1 y 20. Las claves correctas se guardan en un esquema privado. Cada envío conserva las preguntas respondidas y el criterio de aprobación, e incluye un identificador para evitar duplicados y una versión para rechazar formularios antiguos. Solo se editan borradores sin intentos. El menú “Mis resultados” conserva los intentos anteriores aunque se añadan lecciones o se despublique una evaluación.
 
 Sin credenciales, `pnpm dev` permite recorrer las vistas de ejemplo localmente. En producción, las rutas de estudio no se abren sin Supabase configurado.
 
@@ -40,6 +41,8 @@ La migración `20261027010000_initial_learning_content.sql` carga este contenido
 El acceso acepta un correo o los usuarios de demostración `alumno1`, `alumno2` y `profesor1`. Se autentican con Supabase y su contraseña; el nombre corto no evita ninguna comprobación de sesión. Las cuentas y sus credenciales se configuran fuera de Git. `profesor1` tiene gestión de contenido; los alumnos solo acceden a sus propias matrículas, progreso y resultados. Los datos de esas cuentas representan escenarios de prueba.
 
 El tutor exige sesión, matrícula y una lección publicada. Obtiene el contexto desde Supabase y añade el avance del estudiante y hasta tres intercambios anteriores de la misma conversación. El navegador no puede enviar mensajes de sistema ni historiales fabricados. Las respuestas se guardan antes de confirmarlas y se recuperan al abrir de nuevo la lección. Cada respuesta admite una valoración útil o un reporte con comentario. El contenido Markdown se presenta sin HTML, enlaces ni imágenes externas generadas por el modelo.
+
+En las lecciones, el tutor se abre desde un botón circular flotante. El panel se puede minimizar o cerrar con Escape sin perder el borrador, la conversación ni una respuesta en curso. Una invitación discreta ofrece ayuda después de un tiempo de lectura, con un intervalo mínimo de 20 minutos entre avisos en la misma pestaña. Abrir el panel y mostrar el aviso no realiza consultas al proveedor de IA.
 
 ## Tecnologías
 
@@ -56,64 +59,79 @@ El tutor exige sesión, matrícula y una lección publicada. Obtiene el contexto
 | Pruebas de base de datos | PGlite, con PostgreSQL y simulación de los roles de Supabase |
 | Gestor de paquetes | pnpm |
 
-## Diseño por capas
+## Organización frontend y backend
 
-```text
-src/app             Rutas, layouts, acciones de servidor y endpoint del Tutor IA
-    │
-    ▼
-src/presentation    Vistas y componentes React
-    │
-    ▼
-src/application     Reglas de acceso, catálogo, panel, lección y Tutor IA
-    │
-    ▼
-src/domain          Entidades y contratos de repositorio
-    ▲
-    │
-src/infrastructure  Implementaciones de datos e integraciones
-```
-
-**Dominio** define los conceptos del negocio y los contratos de repositorio. **Aplicación** contiene reglas de validación, filtrado y preparación del contexto de la lección. **Infraestructura** implementa el catálogo en Supabase, la integración con DeepSeek y los adaptadores de demostración para las funciones pendientes. **Presentación** muestra las vistas y maneja interacciones locales. **App** declara rutas, protege sesiones y conecta las piezas.
+El repositorio separa la interfaz y el servidor en dos carpetas de un workspace pnpm. Conserva la arquitectura por capas dentro del backend y un único despliegue de Next.js. El backend es un paquete de servidor utilizado por las rutas y Server Actions; no requiere un segundo servicio ni un puerto adicional.
 
 ```text
 AulaIA/
-├── public/
-│   └── brand/                     Identidad visual pública
-├── src/
-│   ├── app/
-│   │   ├── (auth)/                 Acceso, registro y acciones de sesión
-│   │   ├── (student)/              Inicio y catálogo con layout compartido
-│   │   ├── (learning)/             Rutas de curso y lección
-│   │   ├── (admin)/                Gestión de contenido para administradores
-│   │   ├── api/tutor/              Endpoint autenticado del Tutor IA
-│   │   └── page.tsx                Redirección inicial
-│   ├── presentation/
-│   │   ├── components/             Shell del estudiante, tarjetas y progreso
-│   │   └── views/                  Acceso, inicio, catálogo, cursos, lección y administración
-│   ├── application/                Casos de uso y filtros
-│   ├── domain/                     Modelos y contratos
-│   └── infrastructure/
-│       ├── demo/                   Repositorio de contenido de ejemplo
-│       ├── supabase/               Cliente SSR, perfiles, contenido, avance y evaluaciones
-│       └── deepseek/               Cliente del Tutor IA
-├── supabase/
-│   ├── migrations/                Perfiles, contenido, avance, evaluaciones, tutor y políticas RLS
-│   └── tests/                     Comprobaciones SQL de aislamiento y relaciones
-├── prolog/                         Reservado para representación lógica
-├── scripts/                        Verificación SQL y evaluación optativa del tutor
-└── tests/
-    ├── unit/                       Reglas de aplicación
-    └── integration/                Comportamiento de las vistas
+├── frontend/
+│   ├── src/
+│   │   ├── app/                    Páginas, layouts y entradas de rutas Next.js
+│   │   ├── presentation/           Vistas, componentes React y estilos
+│   │   └── proxy.ts                Entrada de renovación de sesión
+│   ├── public/                     Imágenes e identidad visual
+│   ├── next.config.ts
+│   └── package.json
+├── backend/
+│   ├── src/
+│   │   ├── interfaces/
+│   │   │   ├── http/               Controladores HTTP del tutor y autenticación
+│   │   │   ├── actions/            Acciones de sesión, contenido y aprendizaje
+│   │   │   └── composition/        Conexión de servicios con sus adaptadores
+│   │   ├── application/            Casos de uso y lógica de negocio
+│   │   ├── domain/                 Entidades y contratos
+│   │   └── infrastructure/
+│   │       ├── supabase/           Repositorios y clientes de servidor
+│   │       ├── deepseek/           Adaptador HTTP del proveedor IA
+│   │       └── demo/               Datos de ejemplo para desarrollo
+│   ├── supabase/
+│   │   ├── migrations/             Esquema, contenido inicial y políticas RLS
+│   │   └── tests/                  Pruebas SQL
+│   ├── scripts/                    Verificación y evaluación optativa
+│   ├── prolog/                     Representación lógica académica
+│   └── package.json
+├── tests/                          Pruebas unitarias, de integración y arquitectura
+├── .env.example                    Plantilla de variables del proyecto
+├── package.json                    Comandos y herramientas comunes
+└── pnpm-workspace.yaml
 ```
+
+### Flujo del Tutor IA
+
+```mermaid
+flowchart TD
+    UI["Frontend: pregunta del estudiante"] --> HTTP["Backend: controlador HTTP y sesión"]
+    HTTP --> SERVICE["Aplicación: servicio de negocio del tutor"]
+    SERVICE --> REPO["Infraestructura: repositorios"]
+    REPO --> DB["Supabase / PostgreSQL"]
+    DB --> REPO
+    REPO --> SERVICE
+    SERVICE --> PROMPT["Validación de matrícula, contexto, historial y presupuesto"]
+    PROMPT --> ADAPTER["Infraestructura: adaptador DeepSeek"]
+    ADAPTER --> API["API DeepSeek: solo mensajes"]
+    API --> ADAPTER
+    ADAPTER --> SERVICE
+    SERVICE --> SAVE["Repositorio: guardar respuesta y consumo"]
+    SAVE --> DB
+    SAVE --> HTTP
+    HTTP --> UI
+```
+
+`createTutorService` verifica que el curso y la lección estén publicados, comprueba la matrícula y prepara el contexto y el historial autorizado. La reserva de consumo se confirma antes de llamar al proveedor. La respuesta se guarda antes de devolverla al navegador; un fallo al guardar no dispara otra consulta pagada. La lectura del historial también pasa por el servicio y requiere matrícula.
+
+DeepSeek recibe únicamente el mensaje de sistema preparado, la pregunta y el historial acotado. No recibe clientes de Supabase, credenciales de base de datos, herramientas SQL ni permisos para consultar o modificar registros. Los repositorios de Supabase y el adaptador DeepSeek son independientes; el servicio de aplicación coordina ambos mediante contratos.
 
 ### Reglas de dependencia
 
-- El dominio no importa código de Next.js, React, Supabase ni DeepSeek.
-- Los casos de uso dependen de contratos del dominio.
-- La infraestructura implementa esos contratos.
-- Las rutas conectan casos de uso, adaptadores y vistas.
-- Las claves privadas y llamadas a IA deben permanecer en el servidor.
+- El dominio y la aplicación no importan Next.js, React ni adaptadores de infraestructura.
+- Los componentes de navegador muestran datos y llaman a `/api/tutor` o a Server Actions.
+- Los componentes de servidor de Next.js pueden cargar datos mediante el backend antes de renderizar una página.
+- Las rutas `frontend/src/app/api/tutor/route.ts` y `auth/callback/route.ts` son entradas mínimas que delegan a controladores del backend.
+- Las acciones de formularios se implementan en `backend/src/interfaces/actions/`, con `use server`.
+- La composición conecta puertos del negocio con repositorios y proveedor; los adaptadores no se llaman entre sí.
+- Los módulos que acceden a claves del tutor llevan `server-only`, para impedir su inclusión en componentes de navegador.
+- Las pruebas de arquitectura verifican el sentido de las dependencias y el aislamiento de los componentes cliente.
 
 ## Ejecución local
 
@@ -126,7 +144,7 @@ pnpm install
 pnpm dev
 ```
 
-Abre `http://localhost:3000`. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `supabase/migrations/` en orden y habilita el proveedor de correo en Authentication. Las migraciones son incrementales: en una base existente aplica solo las pendientes. `20261026000000_assessments.sql` requiere contenido y matrículas e incluye una evaluación de muestra en Python. `20261027000000_tutor_persistence.sql` incorpora historial, control de gasto y valoraciones. Configura las URL de redirección de localhost y del despliegue.
+Abre `http://localhost:3000`. Ejecuta los comandos desde la raíz de AulaIA; `pnpm dev`, `pnpm build` y `pnpm start` delegan en el paquete `frontend`. El archivo privado `.env.local` permanece en la raíz y la configuración del servidor lo carga sin trasladar ni publicar sus claves. Para activar el acceso real, crea `.env.local` a partir de `.env.example` y completa `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Aplica las migraciones de `backend/supabase/migrations/` en orden y habilita el proveedor de correo en Authentication. Las migraciones son incrementales: en una base existente aplica solo las pendientes. `20261026000000_assessments.sql` requiere contenido y matrículas e incluye una evaluación de muestra en Python. `20261027000000_tutor_persistence.sql` incorpora historial, control de gasto y valoraciones. Configura las URL de redirección de localhost y del despliegue.
 
 DeepSeek es opcional para probar matrículas, avance y evaluaciones. Para activar el tutor configura estas variables privadas:
 
@@ -153,16 +171,16 @@ pnpm test:db
 pnpm build
 ```
 
-Las pruebas cubren catálogo, avance, vistas, formularios, envío de evaluaciones, contexto e historial del tutor, consumo y errores del proveedor. `pnpm test:db` crea una base efímera, aplica todas las migraciones y ejecuta `supabase/tests/`: aislamiento entre usuarios, permisos, calificación, versiones, presupuesto, cupo, conservación del consumo y valoraciones. No utiliza el proyecto remoto ni llama a DeepSeek.
+Las pruebas cubren catálogo, avance, vistas, formularios, envío de evaluaciones, contexto e historial del tutor, consumo y errores del proveedor. `pnpm test:db` crea una base efímera, aplica todas las migraciones y ejecuta `backend/supabase/tests/`: aislamiento entre usuarios, permisos, calificación, versiones, presupuesto, cupo, conservación del consumo y valoraciones. No utiliza el proyecto remoto ni llama a DeepSeek.
 
-`node scripts/verify-supabase.mjs` permite verificar el proyecto remoto con dos cuentas sintéticas dedicadas. Requiere `AULAIA_TEST_ACCOUNTS` apuntando a un JSON local con dos objetos `{ "id", "email", "password" }`, y `AULAIA_LIVE_OUTPUT` como ruta de salida externa al repositorio. Solo admite correos con prefijo `aulaia-cap2-` y dominio `example.invalid`. Las cuentas deben crearse para pruebas y tener correo confirmado. El script matricula esas cuentas, registra avance e intentos y comprueba aislamiento; no envía correos ni consulta la IA.
+`node backend/scripts/verify-supabase.mjs` permite verificar el proyecto remoto con dos cuentas sintéticas dedicadas. Requiere `AULAIA_TEST_ACCOUNTS` apuntando a un JSON local con dos objetos `{ "id", "email", "password" }`, y `AULAIA_LIVE_OUTPUT` como ruta de salida externa al repositorio. Solo admite correos con prefijo `aulaia-cap2-` y dominio `example.invalid`. Las cuentas deben crearse para pruebas y tener correo confirmado. El script matricula esas cuentas, registra avance e intentos y comprueba aislamiento; no envía correos ni consulta la IA.
 
 ### Evaluación optativa del asistente
 
-Los 12 casos de `tests/evaluation/tutor-cases.json` cubren conceptos, ejemplos, continuidad, información insuficiente, preguntas ajenas al tema e instrucciones adversarias. `node scripts/evaluate-tutor.mjs` muestra la preparación sin efectuar consultas. Para ejecutar llamadas reales, con Node.js 24, servidor local activo y una cuenta de prueba, configura `EVAL_EMAIL`, `EVAL_PASSWORD` y `EVAL_OUTPUT` (archivo externo al repositorio), y ejecuta:
+Los 12 casos de `tests/evaluation/tutor-cases.json` cubren conceptos, ejemplos, continuidad, información insuficiente, preguntas ajenas al tema e instrucciones adversarias. `node backend/scripts/evaluate-tutor.mjs` muestra la preparación sin efectuar consultas. Para ejecutar llamadas reales, con Node.js 24, servidor local activo y una cuenta de prueba, configura `EVAL_EMAIL`, `EVAL_PASSWORD` y `EVAL_OUTPUT` (archivo externo al repositorio), y ejecuta:
 
 ```bash
-node scripts/evaluate-tutor.mjs --run
+node backend/scripts/evaluate-tutor.mjs --run
 ```
 
 El script exige un tope configurado de hasta USD 0.02, registra respuestas y métricas, y se detiene ante el primer rechazo o fallo. Los casos no se califican automáticamente como correctos: sus criterios deben contrastarse con las respuestas. Una muestra pequeña de desarrollo no mide satisfacción de estudiantes ni mejora del aprendizaje. Las credenciales, respuestas de evaluación y capturas locales no se incorporan al repositorio.
@@ -178,6 +196,8 @@ Proyecto desarrollado con fines académicos. La estructura permite incorporar es
 ## Publicación en Vercel
 
 La primera entrega está publicada en `https://aulaia-ivory.vercel.app`. Se comprobaron el inicio de sesión de alumno y administrador, la gestión de cursos y métricas y una consulta del tutor con recuperación de su conversación después de recargar la página. Los registros de demostración permiten probar el recorrido; no representan una validación con estudiantes reales.
+
+La configuración raíz `vercel.json` ejecuta la compilación del workspace y utiliza `frontend/.next` como directorio de salida. Mantén la raíz del repositorio como Root Directory en este flujo; el despliegue necesita tanto `frontend` como `backend`. No subas únicamente la carpeta frontend.
 
 El proyecto utiliza Node.js 24 y el pnpm indicado en `packageManager`. En Vercel configura `ENABLE_EXPERIMENTAL_COREPACK=1`, además de las variables de `.env.example`. Las claves del proveedor y del servidor de Supabase deben registrarse como variables privadas de producción. `.vercelignore` excluye credenciales, dependencias locales y archivos de verificación de la carga de despliegue.
 

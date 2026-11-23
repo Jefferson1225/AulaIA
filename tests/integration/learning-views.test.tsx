@@ -2,13 +2,13 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import { CourseOverviewView } from "../../src/presentation/views/CourseOverviewView";
-import { LessonView } from "../../src/presentation/views/LessonView";
-import { HomeView } from "../../src/presentation/views/HomeView";
-import { buildCourseProgress, buildLearningDashboard } from "../../src/application/learning-progress";
-import { findLessonInCourse } from "../../src/application/content-access";
+import { CourseOverviewView } from "../../frontend/src/presentation/views/CourseOverviewView";
+import { LessonView } from "../../frontend/src/presentation/views/LessonView";
+import { HomeView } from "../../frontend/src/presentation/views/HomeView";
+import { buildCourseProgress, buildLearningDashboard } from "../../backend/src/application/learning-progress";
+import { findLessonInCourse } from "../../backend/src/application/content-access";
 import { learningCourse, enrolledSnapshot } from "../fixtures/learning";
-import { LearningFeedback } from "../../src/presentation/components/LearningFeedback";
+import { LearningFeedback } from "../../frontend/src/presentation/components/LearningFeedback";
 
 const action = async () => {};
 
@@ -50,7 +50,9 @@ describe("vistas de matrículas y avance", () => {
 
   it("el inicio de una cuenta nueva no inventa matrículas o actividades", () => {
     render(<HomeView {...buildLearningDashboard([], [], { enrollments: [], completions: [] })} displayName="Daniel" />);
-    expect(screen.getByRole("heading", { name: /Hola, Daniel/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Mi espacio de estudio" })).toBeInTheDocument();
+    expect(screen.getByText(/Hola, Daniel/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Explorar catálogo" })).toHaveAttribute("href", "/catalogo");
     expect(screen.getByText(/Todavía no te has matriculado/)).toBeInTheDocument();
     expect(screen.queryByText(/Valentina/)).not.toBeInTheDocument();
     expect(screen.queryByText("Evaluación del Módulo 1")).not.toBeInTheDocument();

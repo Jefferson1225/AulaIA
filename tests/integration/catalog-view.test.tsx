@@ -2,8 +2,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import { CatalogView } from "../../src/presentation/views/CatalogView";
-import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
+import { CatalogView } from "../../frontend/src/presentation/views/CatalogView";
+import { demoCourseRepository } from "../../backend/src/infrastructure/demo/course-repository";
 
 const categories = [
   { slug: "programacion", name: "Programación", position: 1 },

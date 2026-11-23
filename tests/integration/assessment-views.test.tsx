@@ -2,13 +2,22 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import { AssessmentView } from "../../src/presentation/views/AssessmentView";
-import { AssessmentResultView } from "../../src/presentation/views/AssessmentResultView";
+import { AssessmentView } from "../../frontend/src/presentation/views/AssessmentView";
+import { AssessmentResultView } from "../../frontend/src/presentation/views/AssessmentResultView";
 import { exampleAssessment, exampleQuestions, exampleAttempt } from "../fixtures/assessments";
-import { AssessmentHistoryView } from "../../src/presentation/views/AssessmentHistoryView";
-import { AdminAssessmentDetailView } from "../../src/presentation/views/AdminAssessmentDetailView";
-import { CourseOverviewView } from "../../src/presentation/views/CourseOverviewView";
-import { learningCourse } from "../fixtures/learning";
+import { AssessmentHistoryView } from "../../frontend/src/presentation/views/AssessmentHistoryView";
+import { AdminAssessmentDetailView } from "../../frontend/src/presentation/views/AdminAssessmentDetailView";
+import { CourseOverviewView } from "../../frontend/src/presentation/views/CourseOverviewView";
+import { enrolledSnapshot, learningCourse } from "../fixtures/learning";
+import { buildCourseProgress } from "../../backend/src/application/learning-progress";
+
+const partial = buildCourseProgress(learningCourse, enrolledSnapshot);
+const complete = buildCourseProgress(learningCourse, {
+  ...enrolledSnapshot,
+  completions: learningCourse.modules.flatMap(({ lessons }) => lessons.map(({ slug }) => ({
+    courseSlug: learningCourse.slug, lessonSlug: slug, completedAt: "2026-11-21T12:00:00Z",
+  }))),
+});
 
 describe("evaluación y resultado", () => {
   it("permite abrir resultados históricos sin depender de la publicación actual", () => {
@@ -25,15 +34,30 @@ describe("evaluación y resultado", () => {
   it("conecta las evaluaciones publicadas con el detalle del curso", () => {
     render(<CourseOverviewView course={{...learningCourse,slug:"fundamentos-python"}} assessments={[exampleAssessment]} />);
     expect(screen.getByRole("link", { name:/Variables y tipos de datos/ })).toHaveAttribute("href", `/cursos/fundamentos-python/evaluaciones/${exampleAssessment.id}`);
+    expect(screen.getByText("Bloqueada hasta completar el curso")).toBeVisible();
   });
   it("pide matrícula y no muestra preguntas a una cuenta sin inscripción", () => {
-    render(<AssessmentView assessment={exampleAssessment} questions={exampleQuestions} enrolled={false} attempts={[]} requestId="request" submitAction={async () => {}} />);
+    const progress = buildCourseProgress(learningCourse, { enrollments: [], completions: [] });
+    render(<AssessmentView assessment={exampleAssessment} questions={exampleQuestions} progress={progress} attempts={[]} requestId="request" submitAction={async () => {}} />);
     expect(screen.getByRole("link", { name: /Matricularme/ })).toHaveAttribute("href", "/cursos/fundamentos-python");
     expect(screen.queryByText("¿Qué tipo es 24?")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Enviar respuestas" })).not.toBeInTheDocument();
   });
+  it("bloquea el formulario con lecciones pendientes y conserva los resultados guardados", () => {
+    render(<AssessmentView assessment={{ ...exampleAssessment, courseSlug: learningCourse.slug }} questions={exampleQuestions} progress={partial} attempts={[exampleAttempt]} requestId="request" submitAction={async () => {}} />);
+    expect(screen.getByText("1 de 3 lecciones completadas.")).toBeVisible();
+    expect(screen.getByRole("link", { name: "Continuar con la siguiente lección" })).toHaveAttribute("href", "/cursos/robotica-basica/lecciones/mediciones");
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Ver resultado/ })).toBeVisible();
+  });
+  it("mantiene bloqueada la evaluación de un curso sin lecciones", () => {
+    const progress = buildCourseProgress({ ...learningCourse, modules: [] }, enrolledSnapshot);
+    render(<AssessmentView assessment={exampleAssessment} questions={exampleQuestions} progress={progress} attempts={[]} requestId="request" submitAction={async () => {}} />);
+    expect(screen.getByText("Este curso todavía no tiene lecciones disponibles.")).toBeVisible();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+  });
   it("presenta alternativas sin seleccionar y vincula el envío a la evaluación y su token", () => {
-    render(<AssessmentView assessment={exampleAssessment} questions={exampleQuestions} enrolled attempts={[]} requestId="request" submitAction={async () => {}} />);
+    render(<AssessmentView assessment={exampleAssessment} questions={exampleQuestions} progress={complete} attempts={[]} requestId="request" submitAction={async () => {}} />);
     const radios = screen.getAllByRole("radio");
     expect(radios).toHaveLength(4);
     radios.forEach((radio) => expect(radio).not.toBeChecked());

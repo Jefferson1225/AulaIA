@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import { LoginView } from "../../src/presentation/views/LoginView";
-import { LessonView } from "../../src/presentation/views/LessonView";
-import { demoCourseRepository } from "../../src/infrastructure/demo/course-repository";
+import { LoginView } from "../../frontend/src/presentation/views/LoginView";
+import { LessonView } from "../../frontend/src/presentation/views/LessonView";
+import { demoCourseRepository } from "../../backend/src/infrastructure/demo/course-repository";
 
 describe("vistas de ejemplo", () => {
   it("muestra un formulario de acceso y la demostración solo cuando Supabase no está configurado", () => {
@@ -23,7 +23,9 @@ describe("vistas de ejemplo", () => {
 
     expect(screen.getByRole("heading", { name: "Variables y tipos de datos" })).toBeInTheDocument();
     expect(screen.getByText(/nombre = "Valentina"/)).toBeInTheDocument();
-    expect(screen.getByText(/Tutor IA · Vista previa/)).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Abrir Tutor IA" }));
+    expect(screen.getByText(/Tutor IA · Vista previa/)).toBeVisible();
   });
 
   it("usa el nombre y la navegación de una lección gestionada", async () => {
