@@ -28,6 +28,7 @@ a { color: inherit; text-decoration: none; }
 
 .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; border-radius: 11px; border: 1px solid transparent; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .18s, transform .18s, box-shadow .18s; }
 .button:hover { transform: translateY(-1px); }
+.button:active:not(:disabled) { transform: none; transition-duration: 0s; }
 .button-primary { background: var(--accent); color: #fff; box-shadow: 0 8px 18px #3629a920; }
 .button-primary:hover { background: #29208c; box-shadow: 0 10px 20px #3629a930; }
 .button-outline { background: var(--surface); border-color: var(--border); color: var(--foreground); }
@@ -62,6 +63,17 @@ a { color: inherit; text-decoration: none; }
 
 /* Shared student content */
 .view-container { max-width: 1400px; margin: 0 auto; padding: 41px clamp(24px, 3.3vw, 54px) 70px; }
+.route-loading { color: var(--muted); font-size: 13px; }
+.route-loading p { margin: 0 0 16px; }
+.route-loading-card { display: grid; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+.route-loading-card span { height: 12px; max-width: 42rem; border-radius: 6px; background: var(--accent-soft); }
+.route-loading-card span:first-child { width: min(14rem, 65%); height: 22px; }
+.route-loading-card span:last-child { width: min(28rem, 80%); }
+.navigation-pending { flex: none; margin-left: auto; width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: navigation-spin .75s linear infinite; }
+@keyframes navigation-spin { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) {
+  .navigation-pending { animation: none; }
+}
 .page-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 32px; }
 .page-heading h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(28px, 3vw, 36px); letter-spacing: -.04em; line-height: 1.18; font-weight: 800; }
 .page-heading p:last-child { margin: 9px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }

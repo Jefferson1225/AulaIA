@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireContentAdmin } from "@aulaia/backend/infrastructure/supabase/admin-access";
+import { requireAdminForRender } from "@/app/render-data";
 
 export const metadata: Metadata = { title: "Métricas del Tutor IA · AulaIA" };
 interface Metrics {
@@ -8,7 +8,7 @@ interface Metrics {
   rated: number; positive: number; negative: number; truncated: number; models: string[];
 }
 export default async function TutorMetricsPage() {
-  const client = await requireContentAdmin();
+  const client = await requireAdminForRender();
   const { data, error } = await client.rpc("get_tutor_metrics");
   if (error || !data) return <div className="admin-container"><h1>Métricas del Tutor IA</h1><p role="alert">No se pudieron consultar las métricas.</p></div>;
   const metrics = data as Metrics;

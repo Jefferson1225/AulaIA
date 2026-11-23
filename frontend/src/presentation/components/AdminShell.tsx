@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeft, BookOpen, ClipboardList, LayoutDashboard, LogOut, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
+import { NavigationPending } from "./NavigationPending";
 
 const adminNavigation = [
   { href: "/admin", label: "Resumen", icon: LayoutDashboard },
@@ -23,9 +24,9 @@ export function AdminShell({ children, signOutAction }: { children: ReactNode; s
         <nav aria-label="Navegación de administración">
           {adminNavigation.map(({ href, label, icon: Icon }) => {
             const current = pathname === href || (href !== "/admin" && pathname.startsWith(href + "/"));
-            return <Link key={href} href={href} aria-current={current ? "page" : undefined}><Icon size={18} aria-hidden="true" />{label}</Link>;
+            return <Link key={href} href={href} aria-current={current ? "page" : undefined}><Icon size={18} aria-hidden="true" />{label}<NavigationPending /></Link>;
           })}
-          <Link href="/inicio"><ArrowLeft size={18} aria-hidden="true" />Espacio de estudio</Link>
+          <Link href="/inicio"><ArrowLeft size={18} aria-hidden="true" />Espacio de estudio<NavigationPending /></Link>
         </nav>
         <form action={signOutAction}><button type="submit"><LogOut size={18} aria-hidden="true" />Cerrar sesión</button></form>
       </aside>

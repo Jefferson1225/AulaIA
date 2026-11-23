@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { parseContentSlug } from "@aulaia/backend/application/content-management";
-import { requireContentAdmin } from "@aulaia/backend/infrastructure/supabase/admin-access";
+import { requireAdminForRender } from "@/app/render-data";
 import { getManagedCourse, listContentCategories } from "@aulaia/backend/infrastructure/supabase/admin-content-repository";
 import { AdminCourseDetailView } from "../../../../../presentation/views/AdminCourseDetailView";
 import {
@@ -20,7 +20,7 @@ export default async function AdminCoursePage({
   const { curso } = await params;
   let slug: string;
   try { slug = parseContentSlug(curso); } catch { notFound(); }
-  const client = await requireContentAdmin();
+  const client = await requireAdminForRender();
   const [course, categories, query] = await Promise.all([
     getManagedCourse(client, slug), listContentCategories(client), searchParams,
   ]);

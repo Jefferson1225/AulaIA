@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRight, ClipboardList, Compass, House, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { Profile } from "@aulaia/backend/domain/profile";
+import { NavigationPending } from "./NavigationPending";
 
 const navigation = [
   { href: "/inicio", label: "Inicio", icon: House },
@@ -43,9 +44,10 @@ export function StudentShell({ children, profile, email, demo = false, signOutAc
             >
               <Icon size={19} strokeWidth={1.8} /><span>{label}</span>
               {pathname === href && <ChevronRight size={15} className="nav-chevron" />}
+              <NavigationPending />
             </Link>
           ))}
-          {profile?.role === "admin" && <Link href="/admin" onClick={() => setMenuOpen(false)} className="nav-link"><LayoutDashboard size={19} strokeWidth={1.8} /><span>Panel de administración</span></Link>}
+          {profile?.role === "admin" && <Link href="/admin" onClick={() => setMenuOpen(false)} className="nav-link"><LayoutDashboard size={19} strokeWidth={1.8} /><span>Panel de administración</span><NavigationPending /></Link>}
         </nav>
         <div className="sidebar-bottom">
           {demo ? <Link className="nav-link" href="/login"><LogOut size={19} strokeWidth={1.8} /><span>Volver al acceso</span></Link> : <form action={signOutAction}><button className="nav-link sidebar-signout" type="submit"><LogOut size={19} strokeWidth={1.8} /><span>Cerrar sesión</span></button></form>}

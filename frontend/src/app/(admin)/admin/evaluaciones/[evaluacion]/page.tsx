@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { parseAssessmentId } from "@aulaia/backend/application/assessments";
-import { requireContentAdmin } from "@aulaia/backend/infrastructure/supabase/admin-access";
+import { requireAdminForRender } from "@/app/render-data";
 import { getManagedAssessment } from "@aulaia/backend/infrastructure/supabase/admin-assessment-repository";
 import { AdminAssessmentDetailView } from "../../../../../presentation/views/AdminAssessmentDetailView";
 import { saveAssessmentAction,saveQuestionAction,deleteQuestionAction,publishAssessmentAction,deleteAssessmentAction } from "@aulaia/backend/interfaces/actions/admin-assessments";
 export const metadata: Metadata = { title: "Editar evaluación · AulaIA" };
 
 export default async function AdminAssessmentPage({ params,searchParams }: { params: Promise<{ evaluacion: string }>; searchParams: Promise<{ estado?: string }> }) {
-  const client = await requireContentAdmin();
+  const client = await requireAdminForRender();
   const { evaluacion } = await params;
   let id: string;
   try { id=parseAssessmentId(evaluacion); } catch { notFound(); }

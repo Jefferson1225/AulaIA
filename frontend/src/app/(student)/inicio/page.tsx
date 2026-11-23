@@ -4,19 +4,18 @@ import { demoCourseRepository } from "@aulaia/backend/infrastructure/demo/course
 import { HomeView } from "../../../presentation/views/HomeView";
 import { buildLearningDashboard } from "@aulaia/backend/application/learning-progress";
 import { getSupabaseConfig } from "@aulaia/backend/infrastructure/supabase/config";
-import { requireLearningUser } from "@aulaia/backend/infrastructure/supabase/learning-access";
+import { getProfileForRender, requireStudentForRender } from "@/app/render-data";
 import { createLearningRepository, listLearningContent } from "@aulaia/backend/infrastructure/supabase/learning-repository";
 import { supabaseCatalogRepository } from "@aulaia/backend/infrastructure/supabase/catalog-repository";
-import { getProfile } from "@aulaia/backend/infrastructure/supabase/profile-repository";
 import { listPublishedAssessments } from "@aulaia/backend/infrastructure/supabase/assessment-repository";
 
 export const metadata: Metadata = { title: "Inicio · AulaIA" };
 
 export default async function StudentHomePage() {
   if (getSupabaseConfig()) {
-    const { client, user } = await requireLearningUser();
+    const { client, user } = await requireStudentForRender();
     const [snapshot, catalog, profile] = await Promise.all([
-      createLearningRepository(client, user.id).read(), supabaseCatalogRepository.listPublished(), getProfile(user.id),
+      createLearningRepository(client, user.id).read(), supabaseCatalogRepository.listPublished(), getProfileForRender(user.id),
     ]);
     const enrolledSlugs = new Set(snapshot.enrollments.map((item) => item.courseSlug));
     const visibleEnrollments = catalog.courses.filter((course) => enrolledSlugs.has(course.slug)).map((course) => course.slug);

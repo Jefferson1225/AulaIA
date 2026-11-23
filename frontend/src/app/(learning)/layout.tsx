@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getSupabaseConfig } from "@aulaia/backend/infrastructure/supabase/config";
-import { createSupabaseServerClient } from "@aulaia/backend/infrastructure/supabase/server";
+import { requireStudentForRender } from "@/app/render-data";
 import "../../presentation/content.css";
 import "../../presentation/learning.css";
 import "../../presentation/tutor.css";
@@ -15,8 +15,6 @@ export default async function LearningLayout({ children }: { children: ReactNode
     return children;
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) redirect("/login");
+  await requireStudentForRender();
   return children;
 }

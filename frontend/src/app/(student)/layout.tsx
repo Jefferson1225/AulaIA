@@ -2,9 +2,8 @@ import type { ReactNode } from "react";
 import { StudentShell } from "../../presentation/components/StudentShell";
 import { redirect } from "next/navigation";
 import { getSupabaseConfig } from "@aulaia/backend/infrastructure/supabase/config";
-import { createSupabaseServerClient } from "@aulaia/backend/infrastructure/supabase/server";
-import { getProfile } from "@aulaia/backend/infrastructure/supabase/profile-repository";
 import { signOut } from "@aulaia/backend/interfaces/actions/auth";
+import { getProfileForRender, requireStudentForRender } from "@/app/render-data";
 import "../../presentation/learning.css";
 import "../../presentation/assessments.css";
 
@@ -16,9 +15,7 @@ export default async function StudentLayout({ children }: { children: ReactNode 
     return <StudentShell demo>{children}</StudentShell>;
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) redirect("/login");
-  const profile = await getProfile(user.id);
+  const { user } = await requireStudentForRender();
+  const profile = await getProfileForRender(user.id);
   return <StudentShell profile={profile} email={user.email} signOutAction={signOut}>{children}</StudentShell>;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireContentAdmin } from "@aulaia/backend/infrastructure/supabase/admin-access";
+import { requireAdminForRender } from "@/app/render-data";
 import { listContentCategories, listManagedCourses } from "@aulaia/backend/infrastructure/supabase/admin-content-repository";
 import { AdminCoursesView } from "../../../../presentation/views/AdminCoursesView";
 import { createCourseAction } from "@aulaia/backend/interfaces/actions/admin-content";
@@ -7,7 +7,7 @@ import { createCourseAction } from "@aulaia/backend/interfaces/actions/admin-con
 export const metadata: Metadata = { title: "Gestión de cursos · AulaIA" };
 
 export default async function AdminCoursesPage({ searchParams }: { searchParams: Promise<{ estado?: string }> }) {
-  const client = await requireContentAdmin();
+  const client = await requireAdminForRender();
   const [categories, courses, query] = await Promise.all([
     listContentCategories(client), listManagedCourses(client), searchParams,
   ]);
