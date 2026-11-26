@@ -1,0 +1,18 @@
+.plans-view { max-width: 1180px; }
+.plans-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.plans-card { padding: clamp(20px, 3vw, 30px); border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.plans-card-header { display: flex; gap: 16px; align-items: center; }
+.plans-card-header h2 { margin: 0; font: 800 clamp(23px, 2.4vw, 30px)/1.2 var(--font-display); letter-spacing: -.035em; }
+.plans-card-header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.plans-features { margin: 20px 0 0; padding: 0; list-style: none; }
+.plans-features li { display: flex; gap: 16px; align-items: center; min-height: 68px; padding: 12px 0; border-top: 1px solid var(--border); font-size: 14px; font-weight: 650; }
+.plans-features li:last-child { padding-bottom: 0; }
+.plans-features .study-icon { width: 36px; height: 36px; }
+.plans-features strong { color: var(--accent); font: 800 28px/1.1 var(--font-display); }
+.plans-note { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; padding: 16px 18px; border-radius: 12px; background: var(--accent-soft); color: var(--foreground); font-size: 14px; line-height: 1.55; }
+.plans-note svg { flex: none; margin-top: 2px; color: var(--accent); }
+.plans-note p { margin: 3px 0 0; color: var(--muted); }
+
+@media (max-width: 720px) {
+  .plans-grid { grid-template-columns: 1fr; gap: 14px; }
+}

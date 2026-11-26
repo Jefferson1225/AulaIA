@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, ClipboardList, Compass, House, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { ChevronRight, ClipboardList, Compass, House, Layers, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { Profile } from "@aulaia/backend/domain/profile";
 import { NavigationPending } from "./NavigationPending";
@@ -12,6 +12,7 @@ const navigation = [
   { href: "/inicio", label: "Inicio", icon: House },
   { href: "/catalogo", label: "Catálogo", icon: Compass },
   { href: "/resultados", label: "Mis resultados", icon: ClipboardList },
+  { href: "/planes", label: "Planes", icon: Layers },
 ];
 
 const roleLabels = { student: "Estudiante", teacher: "Docente", admin: "Administrador" };

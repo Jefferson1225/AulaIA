@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, BookOpen, ClipboardList, LayoutDashboard, LogOut, MessageCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, ClipboardList, Layers, LayoutDashboard, LogOut, MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { NavigationPending } from "./NavigationPending";
 
@@ -12,6 +12,7 @@ const adminNavigation = [
   { href: "/admin/cursos", label: "Cursos y contenido", icon: BookOpen },
   { href: "/admin/evaluaciones", label: "Evaluaciones", icon: ClipboardList },
   { href: "/admin/tutor", label: "Tutor IA", icon: MessageCircle },
+  { href: "/admin/planes", label: "Planes", icon: Layers },
 ];
 
 export function AdminShell({ children, signOutAction }: { children: ReactNode; signOutAction: () => Promise<void> }) {
